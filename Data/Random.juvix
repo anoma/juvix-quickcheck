@@ -1,0 +1,130 @@
+module Data.Random;
+
+open import Stdlib.Prelude;
+open import Stdlib.Data.Nat.Ord;
+
+module RandomInt;
+  open import Stdlib.Data.Int public;
+  open import Stdlib.Data.Int.Ord public;
+end;
+
+type StdGen :=
+  | stdGen : Nat -> Nat -> StdGen;
+
+stdGenS1 : StdGen -> Nat;
+stdGenS1 (stdGen s1 _) := s1;
+
+stdGenS2 : StdGen -> Nat;
+stdGenS2 (stdGen _ s2) := s2;
+
+mkStdGen : Nat -> StdGen;
+mkStdGen seed :=
+  let
+    q : Nat := div seed 2147483562;
+    s1 : Nat := mod seed 2147483562;
+    s2 : Nat := mod q 2147483398;
+  in stdGen (s1 + 1) (s2 + 1);
+
+stdRange : Nat × Nat;
+stdRange := 1, 2147483562;
+
+stdNext : StdGen -> Nat × StdGen;
+stdNext (stdGen s1Nat s2Nat) :=
+  let
+    s1 : Int := ofNat s1Nat;
+    s2 : Int := ofNat s2Nat;
+    k : Int := RandomInt.div s1 53668;
+    s1' :
+        Int :=
+          40014 RandomInt.* (s1 RandomInt.- k RandomInt.* 53668)
+            RandomInt.- k RandomInt.* 12211;
+    s1'' :
+        Int :=
+          if (s1' RandomInt.< 0) (s1' RandomInt.+ 2147483563) s1';
+    k' : Int := RandomInt.div s2 52774;
+    s2' :
+        Int :=
+          40692 RandomInt.* (s2 RandomInt.- k' RandomInt.* 52774)
+            RandomInt.- k' RandomInt.* 3791;
+    s2'' :
+        Int :=
+          if (s2' RandomInt.< 0) (s2' RandomInt.+ 2147483399) s2';
+    z : Int := s1'' RandomInt.- s2'';
+    z' :
+        Int :=
+          if
+            (z RandomInt.< 1)
+            (z RandomInt.+ 2147483562)
+            (RandomInt.mod z 2147483562);
+  in toNat z', stdGen (toNat s1'') (toNat s2'');
+
+stdSplit : StdGen -> StdGen × StdGen;
+stdSplit g@(stdGen s1 s2) :=
+  let
+    newS1 : Nat := if (s1 == 2147483562) 1 (s1 + 1);
+    newS2 : Nat := if (s2 == 1) 2147483398 (sub s2 1);
+    newG : StdGen := snd (stdNext g);
+    leftG : StdGen := stdGen newS1 (stdGenS2 newG);
+    rightG : StdGen := stdGen (stdGenS1 newG) newS2;
+  in leftG, rightG;
+
+randNatAux :
+  StdGen
+    -> Nat
+    -> Nat
+    -> Nat
+    -> Nat × StdGen
+    -> Nat × StdGen;
+randNatAux g genLo genMag :=
+  let
+    terminating
+    go : Nat -> Nat × StdGen -> Nat × StdGen;
+    go zero p@(v, g) := p;
+    go r'@(suc _) (v, g) :=
+      let
+        n : Nat × StdGen := stdNext g;
+        v' : Nat := v * genMag + sub (fst n) genLo;
+      in go (div r' (sub genMag 1)) (v', snd n);
+  in go;
+
+randNat : StdGen -> Nat -> Nat -> Nat × StdGen;
+randNat g lo hi :=
+  let
+    genLo : Nat := fst stdRange;
+    genHi : Nat := snd stdRange;
+    genMag : Nat := sub genHi genLo + 1;
+    q : Nat := 1000;
+    k : Nat := sub hi lo + 1;
+    tgtMag : Nat := k * q;
+    x : Nat × StdGen := randNatAux g genLo genMag tgtMag (0, g);
+    v : Nat := fst x;
+    g' : StdGen := snd x;
+    v' : Nat := lo + mod v k;
+  in v', g';
+
+randBool : StdGen -> Bool × StdGen;
+randBool g :=
+  let
+    x : Nat × StdGen := randNat g 0 1;
+    b : Bool := fst x == 1;
+  in b, snd x;
+
+run : Nat -> StdGen -> IO;
+run zero _ := printString "";
+run (suc n) g :=
+  let
+    next : Nat × StdGen := randNat g 0 100;
+    b : Nat := fst next;
+    g' : StdGen := snd next;
+  in printNatLn b >> run n g';
+
+main : IO;
+main :=
+  let
+    go : String -> IO;
+    go s :=
+      let
+        seed : Nat := stringToNat s;
+        initG : StdGen := mkStdGen seed;
+      in run 100 initG;
+  in readLn go;
