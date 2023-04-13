@@ -28,7 +28,7 @@ showResult (failure seed cs) :=
     ++str "(seed : "
     ++str natToString seed
     ++str " , counterExamples: "
-    ++str ("[" ++str (intercalate ", " cs) ++str "]")
+    ++str ("[" ++str intercalate ", " cs ++str "]")
     ++str ")";
 
 foldMap :
