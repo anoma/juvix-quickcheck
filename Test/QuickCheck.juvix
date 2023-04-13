@@ -1,7 +1,7 @@
 module Test.QuickCheck;
 
 open import Data.Random using {StdGen;stdSplit;mkStdGen;stdNext};
-open import Stdlib.Prelude hiding {+};
+open import Stdlib.Prelude hiding {+;mod};
 
 import Stdlib.Data.Nat;
 
@@ -207,6 +207,13 @@ prop-add-sub a b := a Stdlib.Data.Int.Ord.== a + b - b;
 
 prop-add-sub-bad : Int -> Int -> Bool;
 prop-add-sub-bad a b := a Stdlib.Data.Int.Ord.== 2;
+
+terminating
+gcd' : Int → Int → Int;
+gcd' a b := if (a == 0) b (gcd' (mod b a) a);
+
+gcd : Int → Int → Int;
+gcd a b := if (a > b) (gcd' b a) (gcd' a b);
 
 main : IO;
 main :=
