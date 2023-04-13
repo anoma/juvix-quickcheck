@@ -221,6 +221,9 @@ gcd' a b := if (a == 0) b (gcd' (mod b a) a);
 gcd : Int → Int → Int;
 gcd a b := if (a > b) (gcd' b a) (gcd' a b);
 
+prop-gcd-bad : Int -> Int -> Bool;
+prop-gcd-bad a b := gcd a b > 1;
+
 main : IO;
 main :=
   readLn
@@ -231,5 +234,5 @@ main :=
             100
             (stringToNat seed)
             testableBinaryInt
-            prop-add-sub-bad))
+            prop-gcd-bad))
     };
