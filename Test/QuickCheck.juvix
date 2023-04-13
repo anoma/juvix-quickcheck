@@ -4,6 +4,7 @@ open import Data.Random using {StdGen;stdSplit;mkStdGen;stdNext};
 open import Stdlib.Prelude hiding {+;mod};
 
 import Stdlib.Data.Nat;
+import Stdlib.Data.Nat.Ord;
 
 open import Stdlib.Data.Int.Ord;
 open import Stdlib.Data.Int;
@@ -75,7 +76,12 @@ arbitraryInt :=
   arbitrary
     (gen
       \ {
-        | rand := ofNat (fst (stdNext rand))
+        | rand := let
+          n : Nat := fst (stdNext rand);
+        in if
+          (Stdlib.Data.Nat.mod n 2 Stdlib.Data.Nat.Ord.== 0)
+          (negSuc (Stdlib.Data.Nat.div n 2))
+          (ofNat (Stdlib.Data.Nat.div (Stdlib.Data.Nat.sub n 1) 2))
       });
 
 showableBool : Showable Bool;
