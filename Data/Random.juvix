@@ -141,21 +141,3 @@ main :=
         initG : StdGen := mkStdGen seed;
       in run 100 initG;
   in readLn go;
--- main' : IO;
--- main' :=
---   let
---     f : Nat -> StdGen -> IO;
---     f zero _ := printStringLn "Finished";
---     f (suc n) g :=
---       let
---         next : Bool × StdGen := randBool g;
---         b : Bool := fst next;
---         g' : StdGen := snd next;
---       in printBoolLn b >> f n g';
---     go : String -> IO;
---     go s :=
---       let
---         seed : Nat := stringToNat s;
---         initG : StdGen := mkStdGen seed;
---       in f 100 initG;
---   in readLn go;
