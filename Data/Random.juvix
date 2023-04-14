@@ -1,3 +1,7 @@
+
+-- | An implementation of a random number generator from Efficient and Portable Combined Random Number Generators by Pierre L'Ecuyer.
+-- This uses the portable generator for 16-bit computers due to the Int size limitation of th current Juvix compiler.
+-- The period of the generator is approximately 8 x 10^12 with 32362 possible output values.
 module Data.Random;
 
 open import Stdlib.Prelude;
@@ -7,63 +11,86 @@ import Stdlib.Data.Int;
 import Stdlib.Data.Int.Ord;
 
 type StdGen :=
-  | stdGen : Nat -> Nat -> StdGen;
+  | stdGen : Nat -> Nat -> Nat -> StdGen;
 
 stdGenS1 : StdGen -> Nat;
-stdGenS1 (stdGen s1 _) := s1;
+stdGenS1 (stdGen s1 _ _) := s1;
 
 stdGenS2 : StdGen -> Nat;
-stdGenS2 (stdGen _ s2) := s2;
+stdGenS2 (stdGen _ s2 _) := s2;
 
+stdGenS3 : StdGen -> Nat;
+stdGenS3 (stdGen _ _ s3) := s3;
+
+k1 : Nat := 32362;
+k2 : Nat := 31726;
+k3 : Nat := 31656;
 mkStdGen : Nat -> StdGen;
 mkStdGen seed :=
   let
-    q : Nat := div seed 2147483562;
-    s1 : Nat := mod seed 2147483562;
-    s2 : Nat := mod q 2147483398;
-  in stdGen (s1 + 1) (s2 + 1);
+    q1 : Nat := div seed k1;
+    s1 : Nat := mod seed k1;
+    q2 : Nat := div q1 k2;
+    s2 : Nat := mod q1 k2;
+    s3 : Nat := mod q2 k3;
+  in stdGen (s1 + 1) (s2 + 1) (s3 + 1);
 
 stdRange : Nat × Nat;
-stdRange := 1, 2147483562;
+stdRange := 1, k1;
 
 stdNext : StdGen -> Nat × StdGen;
-stdNext (stdGen s1Nat s2Nat) :=
+stdNext (stdGen s1Nat s2Nat s3Nat) :=
   let
     s1 : Int := ofNat s1Nat;
     s2 : Int := ofNat s2Nat;
-    k : Int := Stdlib.Data.Int.div s1 53668;
+    s3 : Int := ofNat s3Nat;
+    k : Int := Stdlib.Data.Int.div s1 206;
     s1' :
         Int :=
-          40014 Stdlib.Data.Int.* (s1 Stdlib.Data.Int.- k Stdlib.Data.Int.* 53668)
-            Stdlib.Data.Int.- k Stdlib.Data.Int.* 12211;
+          157 Stdlib.Data.Int.* (s1 Stdlib.Data.Int.- k Stdlib.Data.Int.* 206)
+            Stdlib.Data.Int.- k Stdlib.Data.Int.* 21;
     s1'' :
         Int :=
-          if (s1' Stdlib.Data.Int.Ord.< 0) (s1' Stdlib.Data.Int.+ 2147483563) s1';
-    k' : Int := Stdlib.Data.Int.div s2 52774;
+          if (s1' Stdlib.Data.Int.Ord.< 0) (s1' Stdlib.Data.Int.+ 32363) s1';
+    k' : Int := Stdlib.Data.Int.div s2 217;
     s2' :
         Int :=
-          40692 Stdlib.Data.Int.* (s2 Stdlib.Data.Int.- k' Stdlib.Data.Int.* 52774)
-            Stdlib.Data.Int.- k' Stdlib.Data.Int.* 3791;
+          146 Stdlib.Data.Int.* (s2 Stdlib.Data.Int.- k' Stdlib.Data.Int.* 217)
+            Stdlib.Data.Int.- k' Stdlib.Data.Int.* 45;
     s2'' :
         Int :=
-          if (s2' Stdlib.Data.Int.Ord.< 0) (s2' Stdlib.Data.Int.+ 2147483399) s2';
+          if (s2' Stdlib.Data.Int.Ord.< 0) (s2' Stdlib.Data.Int.+ 31727) s2';
+    k'' : Int := Stdlib.Data.Int.div s3 222;
+    s3' : Int :=
+          142 Stdlib.Data.Int.* (s3 Stdlib.Data.Int.- k' Stdlib.Data.Int.* 222)
+            Stdlib.Data.Int.- k' Stdlib.Data.Int.* 133;
+    s3'' :
+        Int :=
+          if (s2' Stdlib.Data.Int.Ord.< 0) (s2' Stdlib.Data.Int.+ 31657) s3';
+
     z : Int := s1'' Stdlib.Data.Int.- s2'';
     z' :
         Int :=
           if
-            (z Stdlib.Data.Int.Ord.< 1)
-            (z Stdlib.Data.Int.+ 2147483562)
-            (Stdlib.Data.Int.mod z 2147483562);
-  in toNat z', stdGen (toNat s1'') (toNat s2'');
+            (z Stdlib.Data.Int.Ord.> 706)
+            (z Stdlib.Data.Int.- 32362)
+            z;
+
+    z'' : Int := if
+              (z' Stdlib.Data.Int.Ord.< 1)
+              (z' Stdlib.Data.Int.+ 32362)
+              (Stdlib.Data.Int.mod z (ofNat k1));
+  in toNat z'', stdGen (toNat s1'') (toNat s2'') (toNat s3'');
 
 stdSplit : StdGen -> StdGen × StdGen;
-stdSplit g@(stdGen s1 s2) :=
+stdSplit g@(stdGen s1 s2 s3) :=
   let
-    newS1 : Nat := if (s1 == 2147483562) 1 (s1 + 1);
-    newS2 : Nat := if (s2 == 1) 2147483398 (sub s2 1);
+    newS1 : Nat := if (s1 == k1) 1 (s1 + 1);
+    newS2 : Nat := if (s2 == 1) k2 (sub s2 1);
+    newS3 : Nat := if (s3 == k3) 1 (s3 + 1);
     newG : StdGen := snd (stdNext g);
-    leftG : StdGen := stdGen newS1 (stdGenS2 newG);
-    rightG : StdGen := stdGen (stdGenS1 newG) newS2;
+    leftG : StdGen := stdGen newS1 (stdGenS2 newG) newS3;
+    rightG : StdGen := stdGen (stdGenS1 newG) newS2 newS3;
   in leftG, rightG;
 
 randNatAux :
