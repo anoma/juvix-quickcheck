@@ -89,7 +89,7 @@ stdSplit g@(stdGen s1 s2 s3) :=
     newS2 : Nat := if (s2 == 1) k2 (sub s2 1);
     newS3 : Nat := if (s3 == k3) 1 (s3 + 1);
     newG : StdGen := snd (stdNext g);
-    leftG : StdGen := stdGen newS1 (stdGenS2 newG) newS3;
+    leftG : StdGen := stdGen newS1 (stdGenS2 newG) (stdGenS3 newG);
     rightG : StdGen := stdGen (stdGenS1 newG) newS2 newS3;
   in leftG, rightG;
 
