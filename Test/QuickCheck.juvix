@@ -3,8 +3,8 @@ module Test.QuickCheck;
 open import Data.Random using {StdGen;stdSplit;mkStdGen;stdNext;randBool};
 open import Stdlib.Prelude hiding {+;mod};
 
-import Stdlib.Data.Nat;
-import Stdlib.Data.Nat.Ord;
+import Stdlib.Data.Nat as Nat;
+import Stdlib.Data.Nat.Ord as Nat;
 
 open import Stdlib.Data.Int.Ord;
 open import Stdlib.Data.Int;
@@ -191,7 +191,7 @@ quickcheck {P} attemptNum startSeed (testable asProp) p :=
       let
         go : Nat -> List Nat -> List Nat;
         go zero ls := ls;
-        go (suc n) ls := go n (startSeed Stdlib.Data.Nat.+ n :: ls);
+        go (suc n) ls := go n (startSeed Nat.+ n :: ls);
       in go attemptNum nil;
     runOne : Property -> Nat -> Result;
     runOne prop seed :=
@@ -208,10 +208,10 @@ quickcheck {P} attemptNum startSeed (testable asProp) p :=
   in runAll (asProp p);
 
 prop-add-sub : Int -> Int -> Bool;
-prop-add-sub a b := a Stdlib.Data.Int.Ord.== a + b - b;
+prop-add-sub a b := a == a + b - b;
 
 prop-add-sub-bad : Int -> Int -> Bool;
-prop-add-sub-bad a b := a Stdlib.Data.Int.Ord.== 2;
+prop-add-sub-bad a b := a == 2;
 
 terminating
 gcd' : Int → Int → Int;

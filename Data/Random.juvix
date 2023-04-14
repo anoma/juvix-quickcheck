@@ -1,4 +1,3 @@
-
 -- | An implementation of a random number generator from Efficient and Portable Combined Random Number Generators by Pierre L'Ecuyer.
 -- This uses the portable generator for 16-bit computers due to the Int size limitation of th current Juvix compiler.
 -- The period of the generator is approximately 8 x 10^12 with 32362 possible output values.
@@ -7,8 +6,10 @@ module Data.Random;
 open import Stdlib.Prelude;
 open import Stdlib.Data.Nat.Ord;
 
-import Stdlib.Data.Int;
-import Stdlib.Data.Int.Ord;
+import Stdlib.Data.Int as Int;
+open Int using {Int};
+
+import Stdlib.Data.Int.Ord as Int;
 
 type StdGen :=
   | stdGen : Nat -> Nat -> Nat -> StdGen;
@@ -23,8 +24,11 @@ stdGenS3 : StdGen -> Nat;
 stdGenS3 (stdGen _ _ s3) := s3;
 
 k1 : Nat := 32362;
+
 k2 : Nat := 31726;
+
 k3 : Nat := 31656;
+
 mkStdGen : Nat -> StdGen;
 mkStdGen seed :=
   let
@@ -44,42 +48,25 @@ stdNext (stdGen s1Nat s2Nat s3Nat) :=
     s1 : Int := ofNat s1Nat;
     s2 : Int := ofNat s2Nat;
     s3 : Int := ofNat s3Nat;
-    k : Int := Stdlib.Data.Int.div s1 206;
+    k : Int := Int.div s1 206;
     s1' :
-        Int :=
-          157 Stdlib.Data.Int.* (s1 Stdlib.Data.Int.- k Stdlib.Data.Int.* 206)
-            Stdlib.Data.Int.- k Stdlib.Data.Int.* 21;
-    s1'' :
-        Int :=
-          if (s1' Stdlib.Data.Int.Ord.< 0) (s1' Stdlib.Data.Int.+ 32363) s1';
-    k' : Int := Stdlib.Data.Int.div s2 217;
+        Int := 157 Int.* (s1 Int.- k Int.* 206) Int.- k Int.* 21;
+    s1'' : Int := if (s1' Int.< 0) (s1' Int.+ 32363) s1';
+    k' : Int := Int.div s2 217;
     s2' :
         Int :=
-          146 Stdlib.Data.Int.* (s2 Stdlib.Data.Int.- k' Stdlib.Data.Int.* 217)
-            Stdlib.Data.Int.- k' Stdlib.Data.Int.* 45;
-    s2'' :
+          146 Int.* (s2 Int.- k' Int.* 217) Int.- k' Int.* 45;
+    s2'' : Int := if (s2' Int.< 0) (s2' Int.+ 31727) s2';
+    k'' : Int := Int.div s3 222;
+    s3' :
         Int :=
-          if (s2' Stdlib.Data.Int.Ord.< 0) (s2' Stdlib.Data.Int.+ 31727) s2';
-    k'' : Int := Stdlib.Data.Int.div s3 222;
-    s3' : Int :=
-          142 Stdlib.Data.Int.* (s3 Stdlib.Data.Int.- k' Stdlib.Data.Int.* 222)
-            Stdlib.Data.Int.- k' Stdlib.Data.Int.* 133;
-    s3'' :
+          142 Int.* (s3 Int.- k' Int.* 222) Int.- k' Int.* 133;
+    s3'' : Int := if (s2' Int.< 0) (s2' Int.+ 31657) s3';
+    z : Int := s1'' Int.- s2'';
+    z' : Int := if (z Int.> 706) (z Int.- 32362) z;
+    z'' :
         Int :=
-          if (s2' Stdlib.Data.Int.Ord.< 0) (s2' Stdlib.Data.Int.+ 31657) s3';
-
-    z : Int := s1'' Stdlib.Data.Int.- s2'';
-    z' :
-        Int :=
-          if
-            (z Stdlib.Data.Int.Ord.> 706)
-            (z Stdlib.Data.Int.- 32362)
-            z;
-
-    z'' : Int := if
-              (z' Stdlib.Data.Int.Ord.< 1)
-              (z' Stdlib.Data.Int.+ 32362)
-              (Stdlib.Data.Int.mod z (ofNat k1));
+          if (z' Int.< 1) (z' Int.+ 32362) (Int.mod z (ofNat k1));
   in toNat z'', stdGen (toNat s1'') (toNat s2'') (toNat s3'');
 
 stdSplit : StdGen -> StdGen × StdGen;
@@ -89,7 +76,8 @@ stdSplit g@(stdGen s1 s2 s3) :=
     newS2 : Nat := if (s2 == 1) k2 (sub s2 1);
     newS3 : Nat := if (s3 == k3) 1 (s3 + 1);
     newG : StdGen := snd (stdNext g);
-    leftG : StdGen := stdGen newS1 (stdGenS2 newG) (stdGenS3 newG);
+    leftG :
+        StdGen := stdGen newS1 (stdGenS2 newG) (stdGenS3 newG);
     rightG : StdGen := stdGen (stdGenS1 newG) newS2 newS3;
   in leftG, rightG;
 
@@ -153,3 +141,21 @@ main :=
         initG : StdGen := mkStdGen seed;
       in run 100 initG;
   in readLn go;
+-- main' : IO;
+-- main' :=
+--   let
+--     f : Nat -> StdGen -> IO;
+--     f zero _ := printStringLn "Finished";
+--     f (suc n) g :=
+--       let
+--         next : Bool × StdGen := randBool g;
+--         b : Bool := fst next;
+--         g' : StdGen := snd next;
+--       in printBoolLn b >> f n g';
+--     go : String -> IO;
+--     go s :=
+--       let
+--         seed : Nat := stringToNat s;
+--         initG : StdGen := mkStdGen seed;
+--       in f 100 initG;
+--   in readLn go;
