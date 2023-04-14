@@ -1,6 +1,6 @@
 module Test.QuickCheck;
 
-open import Data.Random using {StdGen;stdSplit;mkStdGen;stdNext};
+open import Data.Random using {StdGen;stdSplit;mkStdGen;stdNext;randBool};
 open import Stdlib.Prelude hiding {+;mod};
 
 import Stdlib.Data.Nat;
@@ -77,11 +77,10 @@ arbitraryInt :=
     (gen
       \ {
         | rand := let
-          n : Nat := fst (stdNext rand);
-        in if
-          (Stdlib.Data.Nat.mod n 2 Stdlib.Data.Nat.Ord.== 0)
-          (negSuc (Stdlib.Data.Nat.div n 2))
-          (ofNat (Stdlib.Data.Nat.div (Stdlib.Data.Nat.sub n 1) 2))
+          runRand : Nat × StdGen := stdNext rand;
+          n : Nat := fst runRand;
+          isPos : Bool := fst (randBool (snd runRand));
+        in if isPos (ofNat n) (negSuc n)
       });
 
 showableBool : Showable Bool;
