@@ -1,0 +1,18 @@
+module Test.QuickCheck.Gen;
+
+open import Data.Random;
+
+-- | A generator of values of type A
+type Gen (A : Type) :=
+  | gen : (StdGen -> A) -> Gen A;
+
+runGen : {A : Type} -> Gen A -> StdGen -> A;
+runGen (gen f) := f;
+
+promote :
+  {A : Type} -> {B : Type} -> (A -> Gen B) -> Gen (A -> B);
+promote f :=
+  gen
+    \ {
+      | rand a := runGen (f a) rand
+    };

@@ -1,0 +1,22 @@
+module Data.Monoid;
+
+open import Stdlib.Prelude;
+
+type Monoid (A : Type) :=
+  | monoid : A -> (A -> A -> A) -> Monoid A;
+
+foldMap :
+  {A : Type}
+    -> {M : Type}
+    -> Monoid M
+    -> (A -> M)
+    -> List A
+    -> M;
+foldMap (monoid mempty mappend) f :=
+  foldr (mappend ∘ f) mempty;
+
+mconcat : {A : Type} -> Monoid A -> List A -> A;
+mconcat m xs := foldMap m id xs;
+
+monoidString : Monoid String;
+monoidString := monoid "" (++str);

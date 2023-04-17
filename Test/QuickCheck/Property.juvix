@@ -1,0 +1,12 @@
+module Test.QuickCheck.Property;
+
+open import Data.Random;
+open import Test.QuickCheck.Gen;
+open import Test.QuickCheck.Result;
+
+-- | A testable predicate from which we can obtain a $Gen Result$
+type Property :=
+  | property : Gen Result -> Property;
+
+runProp : Property -> StdGen -> Result;
+runProp (property g) rand := runGen g rand;

@@ -1,0 +1,32 @@
+module Test.QuickCheck.Result;
+
+open import Stdlib.Prelude;
+open import Data.Monoid;
+open import Data.String;
+
+type Result :=
+  | success : Result
+  | failure : Nat -> List String -> Result;
+
+showResult : Result -> String;
+showResult success := "success";
+showResult (failure seed cs) :=
+  "failure "
+    ++str "(seed : "
+    ++str natToString seed
+    ++str " , counterExamples: "
+    ++str ("[" ++str intercalate ", " cs ++str "]")
+    ++str ")";
+
+monoidResult : Monoid Result;
+monoidResult :=
+  monoid
+    success
+    \ {
+      | x@(failure _ _) _ := x
+      | _ y := y
+    };
+
+overFailure : Result -> (Result -> Result) -> Result;
+overFailure success _ := success;
+overFailure x f := f x;

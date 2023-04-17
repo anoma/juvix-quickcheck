@@ -1,0 +1,5 @@
+module Data.Debug;
+
+terminating
+undefined : {A : Type} -> A;
+undefined := undefined;

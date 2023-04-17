@@ -1,0 +1,44 @@
+module Data.List;
+
+open import Stdlib.Prelude;
+open import Stdlib.Data.Ord;
+
+import Stdlib.Data.Int.Ord as Int;
+
+snoc : {A : Type} -> List A -> A -> List A;
+snoc xs x := xs ++ (x :: nil);
+
+range : Nat -> List Nat;
+range n :=
+  let
+    go : Nat -> List Nat -> List Nat;
+    go zero xs := xs;
+    go (suc n) xs := go n (n :: xs);
+  in
+    go n nil;
+
+qsHelper : {A : Type} → A → List A × List A → List A;
+qsHelper a (l, r) := l ++ (a :: nil) ++ r;
+
+terminating
+quickSort :
+  {A : Type} → (A → A → Ordering) → List A → List A;
+quickSort _ nil := nil;
+quickSort _ (x :: nil) := x :: nil;
+quickSort cmp (x :: xs) :=
+  qsHelper
+    x
+    (both (quickSort cmp) (partition (isGT ∘ cmp x) xs));
+
+sortInt : List Int -> List Int;
+sortInt := quickSort Int.compare;
+
+all : {A : Type} -> (A -> Bool) -> List A -> Bool;
+all p xs := foldl and true (map p xs);
+
+eqListInt : List Int -> List Int -> Bool;
+eqListInt nil nil := true;
+eqListInt (x :: _) nil := false;
+eqListInt nil (x :: _) := false;
+eqListInt (x :: xs) (y :: ys) :=
+  x Int.== y && eqListInt xs ys;

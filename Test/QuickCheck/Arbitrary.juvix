@@ -1,0 +1,65 @@
+module Test.QuickCheck.Arbitrary;
+
+open import Stdlib.Prelude;
+open import Data.Random;
+open import Test.QuickCheck.Gen;
+open import Test.QuickCheck.CoArbitrary;
+
+-- | A generator associated with a type A
+type Arbitrary (A : Type) :=
+  | arbitrary : Gen A -> Arbitrary A;
+
+runArb : {A : Type} -> Arbitrary A -> StdGen -> A;
+runArb (arbitrary g) rand := runGen g rand;
+
+arbitraryInt : Arbitrary Int;
+arbitraryInt :=
+  arbitrary
+    (gen
+      \ {
+        | rand := let
+          runRand : Nat × StdGen := stdNext rand;
+          n : Nat := fst runRand;
+          isPos : Bool := fst (randBool (snd runRand));
+        in if isPos (ofNat n) (negSuc n)
+      });
+
+arbitraryBool : Arbitrary Bool;
+arbitraryBool :=
+  arbitrary
+    (gen
+      \ {
+        | rand := fst (randBool rand)
+      });
+
+arbitraryFunction :
+  {A : Type}
+    -> {B : Type}
+    -> CoArbitrary A B
+    -> Arbitrary B
+    -> Arbitrary (A -> B);
+arbitraryFunction (coarbitrary f) (arbitrary g) :=
+  arbitrary (promote (f g));
+
+arbitraryList :
+  {A : Type} -> Arbitrary A -> Arbitrary (List A);
+arbitraryList {A} (arbitrary g) :=
+  arbitrary
+    (gen
+      \ {
+        | rand := let
+          randSplit : StdGen × StdGen := stdSplit rand;
+          rand1 : StdGen := fst randSplit;
+          rand2 : StdGen := snd randSplit;
+          len : Nat := fst (randNat rand1 0 10);
+          randList : StdGen -> Nat -> List A;
+          randList _ zero := nil;
+          randList r (suc n) :=
+            let
+              rSplit : StdGen × StdGen;
+              rSplit := stdSplit r;
+              r1 : StdGen := fst rSplit;
+              r2 : StdGen := snd rSplit;
+            in runGen g r1 :: randList r2 n;
+        in randList rand2 len
+      });
