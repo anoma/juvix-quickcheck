@@ -1,11 +1,12 @@
 module Test.QuickCheck;
 
-open import Data.Random using {StdGen;stdSplit;mkStdGen;stdNext;randBool};
+open import Data.Random using {StdGen;stdSplit;mkStdGen;stdNext;randBool;randNat};
 open import Stdlib.Prelude hiding {+;mod};
 
 import Stdlib.Data.Nat as Nat;
 import Stdlib.Data.Nat.Ord as Nat;
 
+open import Stdlib.Data.Ord;
 open import Stdlib.Data.Int.Ord;
 open import Stdlib.Data.Int;
 
@@ -67,6 +68,10 @@ type Gen (A : Type) :=
 type Arbitrary (A : Type) :=
   | arbitrary : Gen A -> Arbitrary A;
 
+-- | A perturbation of a generator associated with a type B
+type CoArbitrary (A : Type) (B : Type) :=
+  | coarbitrary : (Gen B -> A -> Gen B) -> CoArbitrary A B;
+
 -- | A testable predicate from which we can obtain a $Gen Result$
 type Property :=
   | property : Gen Result -> Property;
@@ -78,6 +83,135 @@ type Testable (A : Type) :=
 type Showable (A : Type) :=
   | showable : (A -> String) -> Showable A;
 
+runGen : {A : Type} -> Gen A -> StdGen -> A;
+runGen (gen f) := f;
+
+runArb : {A : Type} -> Arbitrary A -> StdGen -> A;
+runArb (arbitrary g) rand := runGen g rand;
+
+promote :
+  {A : Type} -> {B : Type} -> (A -> Gen B) -> Gen (A -> B);
+promote f :=
+  gen
+    \ {
+      | rand a := runGen (f a) rand
+    };
+
+arbitraryFunction :
+  {A : Type}
+    -> {B : Type}
+    -> CoArbitrary A B
+    -> Arbitrary B
+    -> Arbitrary (A -> B);
+arbitraryFunction (coarbitrary f) (arbitrary g) :=
+  arbitrary (promote (f g));
+
+iterate : {A : Type} -> Nat -> (A -> A) -> A -> List A;
+iterate {A} zero _ a := nil;
+iterate {A} (suc n) f a :=
+  let
+    next : A := f a;
+  in next :: iterate n f next;
+
+takeWhile : {A : Type} -> (A -> Bool) -> List A -> List A;
+takeWhile {A} f l :=
+  let
+    go : List A -> List A;
+    go nil := nil;
+    go (x :: xs) := if (f x) (x :: go xs) (go xs);
+  in go l;
+
+abs : Int -> Nat;
+abs (ofNat n) := n;
+abs (negSuc n) := suc n;
+
+binaryDigits : Nat -> List Nat;
+binaryDigits n :=
+  let
+    terminating
+    go : Nat -> List Nat;
+    go n :=
+      if (n Nat.== 0) nil (Nat.mod n 2 :: go (Nat.div n 2));
+  in reverse (go n);
+
+perturb : Int -> StdGen -> StdGen;
+perturb n rand0 :=
+  let
+    vary : Bool -> StdGen -> StdGen;
+    vary b g :=
+      let
+        splitG : StdGen × StdGen := stdSplit g;
+      in if b (snd splitG) (fst splitG);
+    terminating
+    digitsParity : List Bool;
+    digitsParity :=
+      map
+        \ {
+          | x := x Nat.== 0
+        }
+        (binaryDigits (abs n));
+  in foldl
+    \ {
+      | rand b := vary b rand
+    }
+    (vary (n < 0) rand0)
+    digitsParity;
+
+coarbitraryIntInt : CoArbitrary Int Int;
+coarbitraryIntInt :=
+  coarbitrary
+    \ {
+      | g n := gen
+        \ {
+          | rand := runGen g (perturb n rand)
+        }
+    };
+
+coarbitraryListInt : CoArbitrary (List Int) Int;
+coarbitraryListInt :=
+  coarbitrary
+    \ {
+      | g xs := gen
+        \ {
+          | rand := runGen g (foldr perturb (perturb 0 rand) xs)
+        }
+    };
+
+arbitraryList :
+  {A : Type} -> Arbitrary A -> Arbitrary (List A);
+arbitraryList {A} (arbitrary g) :=
+  arbitrary
+    (gen
+      \ {
+        | rand := let
+          randSplit : StdGen × StdGen := stdSplit rand;
+          rand1 : StdGen := fst randSplit;
+          rand2 : StdGen := snd randSplit;
+          len : Nat := fst (randNat rand1 0 10);
+          randList : StdGen -> Nat -> List A;
+          randList _ zero := nil;
+          randList r (suc n) :=
+            let
+              rSplit : StdGen × StdGen;
+              rSplit := stdSplit r;
+              r1 : StdGen := fst rSplit;
+              r2 : StdGen := snd rSplit;
+            in runGen g r1 :: randList r2 n;
+        in randList rand2 len
+      });
+
+showableList :
+  {A : Type} -> Showable A -> Showable (List A);
+showableList (showable show) :=
+  showable
+    \ {
+      | xs := "[" ++str intercalate ", " (map show xs) ++str "]"
+    };
+
+showableFunction :
+  {A : Type} -> {B : Type} -> Showable (A -> B);
+showableFunction := showable (const "function");
+
 arbitraryInt : Arbitrary Int;
 arbitraryInt :=
   arbitrary
@@ -88,6 +222,14 @@ arbitraryInt :=
           n : Nat := fst runRand;
           isPos : Bool := fst (randBool (snd runRand));
         in if isPos (ofNat n) (negSuc n)
+      });
+
+arbitraryBool : Arbitrary Bool;
+arbitraryBool :=
+  arbitrary
+    (gen
+      \ {
+        | rand := fst (randBool rand)
       });
 
 showableBool : Showable Bool;
@@ -105,7 +247,7 @@ showableNat : Showable Nat;
 showableNat := showable natToString;
 
 runProp : Property -> StdGen -> Result;
-runProp (property (gen runGen)) rand := runGen rand;
+runProp (property g) rand := runGen g rand;
 
 toProp : {A : Type} -> Testable A -> A -> Property;
 toProp (testable f) := f;
@@ -138,7 +280,7 @@ forAll :
     -> Gen A
     -> (A -> T)
     -> Property;
-forAll {A} {T} (showable show) (testable asProp) (gen runGen) prop :=
+forAll {A} {T} (showable show) (testable asProp) g prop :=
   property
     (gen
       \ {
@@ -146,7 +288,7 @@ forAll {A} {T} (showable show) (testable asProp) (gen runGen) prop :=
           srand : StdGen × StdGen := stdSplit rand;
           rand1 : StdGen := fst srand;
           rand2 : StdGen := snd srand;
-          arg : A := runGen rand1;
+          arg : A := runGen g rand1;
           subProp : Property := asProp (prop arg);
           res : Result := runProp subProp rand2;
         in overFailure
@@ -185,6 +327,54 @@ testableBinaryInt :=
     showableInt
     arbitraryInt
     (testableFunction showableInt arbitraryInt testableBool);
+
+testableTwoArgFunction' :
+  {A : Type}
+    -> {B : Type}
+    -> {T : Type}
+    -> Showable A
+    -> Arbitrary A
+    -> Testable (B -> T)
+    -> Testable (A -> B -> T);
+testableTwoArgFunction' s g t := testableFunction s g t;
+
+coarbitraryIntBool : CoArbitrary Int Bool;
+coarbitraryIntBool :=
+  coarbitrary
+    \ {
+      | g n := gen
+        \ {
+          | rand := runGen g (perturb n rand)
+        }
+    };
+
+arbitraryFunIntBool : Arbitrary (Int -> Bool);
+arbitraryFunIntBool := undefined;
+
+testableHof : Testable ((Int -> Bool) -> Bool);
+testableHof :=
+  let
+    arb :
+        Arbitrary (Int -> Bool) :=
+          arbitraryFunction coarbitraryIntBool arbitraryBool;
+  in testableFunction showableFunction arb testableBool;
+
+testableHofList :
+  Testable (List Int -> (Int -> Bool) -> Bool);
+testableHofList :=
+  testableFunction
+    (showableList showableInt)
+    (arbitraryList arbitraryInt)
+    testableHof;
+
+testableIntIntHof : Testable ((Int -> Int) -> Bool);
+testableIntIntHof := let
+  arb : Arbitrary (Int -> Int) := arbitraryFunction coarbitraryIntInt arbitraryInt;
+  in testableFunction showableFunction arb testableBool;
+
+testableIntIntToIntInt : Testable (Int -> Int -> (Int -> Int) -> Bool);
+testableIntIntToIntInt :=
+  testableFunction showableInt arbitraryInt (testableFunction showableInt arbitraryInt testableIntIntHof);
 
 quickcheck :
   {P : Type} -> Nat -> Nat -> Testable P -> P -> Result;
@@ -227,8 +417,47 @@ gcd a b := if (a > b) (gcd' b a) (gcd' a b);
 prop-gcd-bad : Int -> Int -> Bool;
 prop-gcd-bad a b := gcd a b > 1;
 
-main : IO;
-main :=
+qsHelper : {A : Type} → A → List A × List A → List A;
+qsHelper a (l, r) := l ++ (a :: nil) ++ r;
+
+terminating
+quickSort :
+  {A : Type} → (A → A → Ordering) → List A → List A;
+quickSort _ nil := nil;
+quickSort _ (x :: nil) := x :: nil;
+quickSort cmp (x :: xs) :=
+  qsHelper
+    x
+    (both (quickSort cmp) (partition (isGT ∘ cmp x) xs));
+
+sortInt : List Int -> List Int;
+sortInt := quickSort compare;
+
+andList : List Bool -> Bool;
+andList := foldl and true;
+
+all : {A : Type} -> (A -> Bool) -> List A -> Bool;
+all p xs := foldl and true (map p xs);
+
+eqListInt : List Int -> List Int -> Bool;
+eqListInt nil nil := true;
+eqListInt (x :: _) nil := false;
+eqListInt nil (x :: _) := false;
+eqListInt (x :: xs) (y :: ys) := x == y && eqListInt xs ys;
+
+prop-partition : List Int -> (Int -> Bool) -> Bool;
+prop-partition xs p :=
+  case partition p xs
+    | lhs, rhs :=
+      all p lhs
+        && not (any p rhs)
+        && eqListInt (sortInt xs) (sortInt (lhs ++ rhs));
+
+prop-distributive : Int -> Int -> (Int -> Int) -> Bool;
+prop-distributive a b f := f (a + b) == f a + f b;
+
+main' : IO;
+main' :=
   readLn
     \ {
       | seed := printStringLn
@@ -238,4 +467,30 @@ main :=
             (stringToNat seed)
             testableBinaryInt
             prop-gcd-bad))
+    };
+
+main'' : IO;
+main'' :=
+  readLn
+    \ {
+      | seed := printStringLn
+        (showResult
+          (quickcheck
+            100
+            (stringToNat seed)
+            testableHofList
+            prop-partition))
+    };
+
+main : IO;
+main :=
+  readLn
+    \ {
+      | seed := printStringLn
+        (showResult
+          (quickcheck
+            100
+            (stringToNat seed)
+            testableIntIntToIntInt
+            prop-distributive))
     };
