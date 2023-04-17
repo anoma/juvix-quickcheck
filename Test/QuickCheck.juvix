@@ -59,14 +59,21 @@ terminating
 undefined : {A : Type} -> A;
 undefined := undefined;
 
+-- | A generator of values of type A
 type Gen (A : Type) :=
   | gen : (StdGen -> A) -> Gen A;
 
+-- | A generator associated with a type A
 type Arbitrary (A : Type) :=
   | arbitrary : Gen A -> Arbitrary A;
 
+-- | A testable predicate from which we can obtain a $Gen Result$
 type Property :=
   | property : Gen Result -> Property;
+
+-- | A conversion from a Type A to a Property
+type Testable (A : Type) :=
+  | testable : (A -> Property) -> Testable A;
 
 type Showable (A : Type) :=
   | showable : (A -> String) -> Showable A;
@@ -99,9 +106,6 @@ showableNat := showable natToString;
 
 runProp : Property -> StdGen -> Result;
 runProp (property (gen runGen)) rand := runGen rand;
-
-type Testable (A : Type) :=
-  | testable : (A -> Property) -> Testable A;
 
 toProp : {A : Type} -> Testable A -> A -> Property;
 toProp (testable f) := f;
