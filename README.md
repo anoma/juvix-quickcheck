@@ -54,5 +54,3 @@ For a larger example see <Example.juvix> and you can run this using:
 ``` shell
 make run-quickcheck
 ```
-
-`
