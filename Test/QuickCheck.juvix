@@ -4,7 +4,7 @@ open import Stdlib.Prelude;
 open import Data.List;
 open import Data.Monoid;
 open import Data.Random;
-open import Test.QuickCheck.Property;
+open import Test.QuickCheck.Property public;
 open import Test.QuickCheck.Result public;
 open import Test.QuickCheck.Testable public;
 

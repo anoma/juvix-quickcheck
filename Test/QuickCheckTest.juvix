@@ -1,0 +1,51 @@
+module Test.QuickCheckTest;
+
+open import Stdlib.Prelude;
+open import Data.List;
+open import Data.String;
+open import Test.QuickCheck public;
+
+-- | The data defining a QuickCheck test
+type Test :=
+  | test : String -> Property -> Test;
+
+mkTest :
+  {Predicate : Type}
+    -> Testable Predicate
+    -> String
+    -> Predicate
+    -> Test;
+mkTest t name p :=
+  test name (toProp t p);
+
+type TestResult :=
+  | testResult : String -> Result -> TestResult;
+
+showTestResult : TestResult -> String;
+showTestResult (testResult name res) :=
+  "'" ++str name ++str "': " ++str showResult res;
+
+runTest :
+  Nat -> Nat -> Test -> TestResult;
+runTest attemptNum seed (test name p) :=
+  testResult
+    name
+    (quickcheck attemptNum seed testableProperty p);
+
+runTests :
+  Nat -> Nat -> List Test -> List TestResult;
+runTests attemptNum startSeed ts :=
+  let
+    numTests : Nat := length ts;
+    testSeeds : List Nat;
+    testSeeds :=
+      map ((+) startSeed) (rangeStep attemptNum numTests);
+  in zipWith (runTest attemptNum) testSeeds ts;
+
+runTestsIO :
+  Nat -> Nat -> List Test -> IO;
+runTestsIO attemptNum startSeed :=
+  printStringLn
+    ∘ lines
+    ∘ map showTestResult
+    ∘ runTests attemptNum startSeed;

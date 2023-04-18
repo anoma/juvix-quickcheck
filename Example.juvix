@@ -3,9 +3,11 @@ module Example;
 open import Stdlib.Prelude hiding {+};
 open import Stdlib.Data.Int.Ord;
 open import Stdlib.Data.Int;
-open import Test.QuickCheck;
 open import Data.List;
+open import Data.String;
 open import Data.Int;
+
+import Test.QuickCheckTest as QC;
 
 prop-partition : List Int -> (Int -> Bool) -> Bool;
 prop-partition xs p :=
@@ -27,41 +29,36 @@ prop-add-sub-bad a b := a == 2;
 prop-gcd-bad : Int -> Int -> Bool;
 prop-gcd-bad a b := gcd a b > 1;
 
+gcdNoCoprimeTest : QC.Test;
+gcdNoCoprimeTest :=
+  QC.mkTest
+    QC.testableBinaryInt
+    "no integers are coprime"
+    prop-gcd-bad;
+
+partitionTest : QC.Test;
+partitionTest :=
+  QC.mkTest
+    QC.testableListIntHofIntBool
+    "partition"
+    prop-partition;
+
+testDistributive : QC.Test;
+testDistributive :=
+  QC.mkTest
+    QC.testableIntIntHofIntInt
+    "all functions are distributive over +"
+    prop-distributive;
+
 main : IO;
 main :=
   readLn
     \ {
-      | seed := printStringLn
-        (showResult
-          (quickcheck
-            100
-            (stringToNat seed)
-            testableBinaryInt
-            prop-gcd-bad))
-    };
-
-main'' : IO;
-main'' :=
-  readLn
-    \ {
-      | seed := printStringLn
-        (showResult
-          (quickcheck
-            100
-            (stringToNat seed)
-            testableListIntHofIntBool
-            prop-partition))
-    };
-
-main' : IO;
-main' :=
-  readLn
-    \ {
-      | seed := printStringLn
-        (showResult
-          (quickcheck
-            100
-            (stringToNat seed)
-            testableIntIntHofIntInt
-            prop-distributive))
+      | seed := QC.runTestsIO
+        100
+        (stringToNat seed)
+        (gcdNoCoprimeTest
+          :: partitionTest
+          :: testDistributive
+          :: nil)
     };

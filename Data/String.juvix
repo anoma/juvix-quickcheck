@@ -6,3 +6,6 @@ open import Data.Monoid;
 intercalate : String → List String → String;
 intercalate sep xs :=
   mconcat monoidString (intersperse sep xs);
+
+lines : List String -> String;
+lines := intercalate "\n";
