@@ -2,8 +2,21 @@ module Data.Function;
 
 open import Stdlib.Prelude;
 
-uncurry : {A : Type} -> {B : Type} -> {C : Type} -> (A -> B -> C) -> (A × B) -> C;
-uncurry f (a , b) := f a b;
+uncurry :
+  {A : Type}
+    -> {B : Type}
+    -> {C : Type}
+    -> (A -> B -> C)
+    -> A × B
+    -> C;
+uncurry f (a, b) := f a b;
 
-curry : {A : Type} -> {B : Type} -> {C : Type} -> ((A × B) -> C) -> A -> B -> C;
+curry :
+  {A : Type}
+    -> {B : Type}
+    -> {C : Type}
+    -> (A × B -> C)
+    -> A
+    -> B
+    -> C;
 curry f a b := f (a, b);

@@ -22,7 +22,9 @@ prop-reverseReverseIsIdentity xs :=
   eqListInt xs (reverse (reverse xs));
 
 prop-tailLengthOneLess : List Int -> Bool;
-prop-tailLengthOneLess xs := null xs || ofNat (length (tail xs)) == (intSubNat (length xs) 1);
+prop-tailLengthOneLess xs :=
+  null xs
+    || ofNat (length (tail xs)) == intSubNat (length xs) 1;
 
 prop-splitAtRecombine : Nat -> List Int -> Bool;
 prop-splitAtRecombine n xs :=

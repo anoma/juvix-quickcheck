@@ -6,32 +6,49 @@ open import Stdlib.Data.Ord;
 import Stdlib.Data.Int.Ord as Int;
 
 snoc : {A : Type} -> List A -> A -> List A;
-snoc xs x := xs ++ (x :: nil);
+snoc xs x := xs ++ x :: nil;
 
 rangeStep : Nat -> Nat -> List Nat;
 rangeStep step n :=
   let
     go : Nat -> List Nat -> List Nat;
     go zero xs := xs;
-    go (suc n) xs := go n ((n * step) :: xs);
-  in
-    go n nil;
+    go (suc n) xs := go n (n * step :: xs);
+  in go n nil;
 
-zip : {A : Type} -> {B : Type} -> List A -> List B -> List (A × B);
-zip (x :: xs) (y :: ys) := (x , y) :: zip xs ys;
+zip :
+  {A : Type}
+    -> {B : Type}
+    -> List A
+    -> List B
+    -> List (A × B);
+zip (x :: xs) (y :: ys) := (x, y) :: zip xs ys;
 zip _ nil := nil;
 zip nil _ := nil;
 
-zipWith : {A : Type} -> {B : Type} -> {C : Type} -> (A -> B -> C) -> List A -> List B -> List C;
-zipWith {A} {B} {C} f as bs := let
-  go : List A -> List B -> List C;
-  go _ nil := nil;
-  go nil _ := nil;
-  go (a :: as) (b :: bs) := f a b :: go as bs;
-  in
-    go as bs;
+zipWith :
+  {A : Type}
+    -> {B : Type}
+    -> {C : Type}
+    -> (A -> B -> C)
+    -> List A
+    -> List B
+    -> List C;
+zipWith {A} {B} {C} f as bs :=
+  let
+    go : List A -> List B -> List C;
+    go _ nil := nil;
+    go nil _ := nil;
+    go (a :: as) (b :: bs) := f a b :: go as bs;
+  in go as bs;
 
-unzipWith : {A : Type} -> {B : Type} -> {C : Type} -> (A -> B -> C) -> List (A × B) -> List C;
+unzipWith :
+  {A : Type}
+    -> {B : Type}
+    -> {C : Type}
+    -> (A -> B -> C)
+    -> List (A × B)
+    -> List C;
 unzipWith := map ∘ uncurry;
 
 range : Nat -> List Nat;

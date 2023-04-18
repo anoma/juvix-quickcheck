@@ -3,6 +3,7 @@ module Test.QuickCheckTest;
 open import Stdlib.Prelude;
 open import Data.List;
 open import Data.String;
+open import Stdlib.Debug.Fail;
 open import Test.QuickCheck public;
 
 -- | The data defining a QuickCheck test
@@ -15,25 +16,28 @@ mkTest :
     -> String
     -> Predicate
     -> Test;
-mkTest t name p :=
-  test name (toProp t p);
+mkTest t name p := test name (toProp t p);
 
 type TestResult :=
   | testResult : String -> Result -> TestResult;
+
+result : TestResult -> Result;
+result (testResult _ r) := r;
+
+allTestSuccess : List TestResult -> Bool;
+allTestSuccess ts := allSuccess (map result ts);
 
 showTestResult : TestResult -> String;
 showTestResult (testResult name res) :=
   "'" ++str name ++str "': " ++str showResult res;
 
-runTest :
-  Nat -> Nat -> Test -> TestResult;
+runTest : Nat -> Nat -> Test -> TestResult;
 runTest attemptNum seed (test name p) :=
   testResult
     name
     (quickcheck attemptNum seed testableProperty p);
 
-runTests :
-  Nat -> Nat -> List Test -> List TestResult;
+runTests : Nat -> Nat -> List Test -> List TestResult;
 runTests attemptNum startSeed ts :=
   let
     numTests : Nat := length ts;
@@ -42,10 +46,13 @@ runTests attemptNum startSeed ts :=
       map ((+) startSeed) (rangeStep attemptNum numTests);
   in zipWith (runTest attemptNum) testSeeds ts;
 
-runTestsIO :
-  Nat -> Nat -> List Test -> IO;
-runTestsIO attemptNum startSeed :=
-  printStringLn
-    ∘ lines
-    ∘ map showTestResult
-    ∘ runTests attemptNum startSeed;
+runTestsIO : Nat -> Nat -> List Test -> IO;
+runTestsIO attemptNum startSeed ts :=
+  let
+    results :
+        List TestResult := runTests attemptNum startSeed ts;
+  in printStringLn (lines (map showTestResult results))
+    >> if
+      (allTestSuccess results)
+      (printStringLn "All tests passed")
+      (fail "Test failed");

@@ -8,6 +8,10 @@ type Result :=
   | success : Result
   | failure : Nat -> List String -> Result;
 
+isSuccess : Result -> Bool;
+isSuccess success := true;
+isSuccess (failure _ _) := false;
+
 showResult : Result -> String;
 showResult success := "success";
 showResult (failure seed cs) :=
@@ -30,3 +34,6 @@ monoidResult :=
 overFailure : Result -> (Result -> Result) -> Result;
 overFailure success _ := success;
 overFailure x f := f x;
+
+allSuccess : List Result -> Bool;
+allSuccess := isSuccess ∘ foldMap monoidResult id;

@@ -90,7 +90,8 @@ testableListInt :=
     (arbitraryList arbitraryInt)
     testableBool;
 
-testableListIntListInt : Testable (List Int -> List Int -> Bool);
+testableListIntListInt :
+  Testable (List Int -> List Int -> Bool);
 testableListIntListInt :=
   testableFunction
     (showableList showableInt)
