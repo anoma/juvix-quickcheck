@@ -83,6 +83,24 @@ testableBinaryInt :=
     arbitraryInt
     (testableFunction showableInt arbitraryInt testableBool);
 
+testableListInt : Testable (List Int -> Bool);
+testableListInt :=
+  testableFunction
+    (showableList showableInt)
+    (arbitraryList arbitraryInt)
+    testableBool;
+
+testableListIntListInt : Testable (List Int -> List Int -> Bool);
+testableListIntListInt :=
+  testableFunction
+    (showableList showableInt)
+    (arbitraryList arbitraryInt)
+    testableListInt;
+
+testableNatListInt : Testable (Nat -> List Int -> Bool);
+testableNatListInt :=
+  testableFunction showableNat arbitraryNat testableListInt;
+
 testableHofIntBool : Testable ((Int -> Bool) -> Bool);
 testableHofIntBool :=
   let

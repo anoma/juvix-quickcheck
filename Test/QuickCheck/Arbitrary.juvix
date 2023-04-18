@@ -12,6 +12,14 @@ type Arbitrary (A : Type) :=
 runArb : {A : Type} -> Arbitrary A -> StdGen -> A;
 runArb (arbitrary g) rand := runGen g rand;
 
+arbitraryNat : Arbitrary Nat;
+arbitraryNat :=
+  arbitrary
+    (gen
+      \ {
+        | rand := fst (stdNext rand)
+      });
+
 arbitraryInt : Arbitrary Int;
 arbitraryInt :=
   arbitrary
