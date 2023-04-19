@@ -36,6 +36,7 @@ jobs:
           repo: anoma/juvix
           tag: latest
           rename-to: juvix
+          chmod: 0755
 
       - name: run quickcheck example
         run: |
