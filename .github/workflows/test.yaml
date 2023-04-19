@@ -31,12 +31,14 @@ jobs:
           echo "WASI_SYSROOT_PATH=$GITHUB_WORKSPACE/wasi-sysroot" >> $GITHUB_ENV
 
       - name: Install the latest Juvix compiler
-        uses: jaxxstorm/action-install-gh-release@v1.9.0
+        uses: jaxxstorm/action-install-gh-release@v1.10.0
         with:
           repo: anoma/juvix
-          rename-to: juvix
+          tag: latest
           chmod: 0755
 
       - name: run quickcheck example
         run: |
+          juvix-linux_x86_64-v0.3.2 --version
+          cp `which juvix-linux_x86_64-v0.3.2` /usr/bin/juvix
           make run-quickcheck
