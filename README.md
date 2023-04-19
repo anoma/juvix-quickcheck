@@ -49,7 +49,7 @@ $ od -An -N2 -t u2 /dev/urandom | xargs | ./Example
 All tests passed
 ```
 
-For a larger example see <Example.juvix> and you can run this using:
+For a larger example see [Example.juvix](Example.juvix) and you can run this using:
 
 ``` shell
 make run-quickcheck
