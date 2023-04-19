@@ -26,8 +26,7 @@ quickcheck attemptNum startSeed t predicate :=
       in overFailure
         result
         \ {
-          | (fail (failure _ cs)) := fail (failure seed cs)
-          | s := s
+          | (failure _ cs) := failure seed cs
         };
     runAll : Property -> Result;
     runAll prop := foldMap monoidResult (runOne prop) seeds;

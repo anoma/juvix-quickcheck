@@ -34,9 +34,9 @@ monoidResult :=
       | _ y := y
     };
 
-overFailure : Result -> (Result -> Result) -> Result;
+overFailure : Result -> (Failure -> Failure) -> Result;
 overFailure success _ := success;
-overFailure x f := f x;
+overFailure (fail x) f := fail (f x);
 
 allSuccess : List Result -> Bool;
 allSuccess := isSuccess ∘ foldMap monoidResult id;

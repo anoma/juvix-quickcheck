@@ -38,8 +38,7 @@ forAll {A} {T} (showable show) (testable asProp) g prop :=
         in overFailure
           res
           \ {
-            | (fail (failure s cs)) := fail (failure s (show arg :: cs))
-            | s := s
+            | (failure s cs) := failure s (show arg :: cs)
           }
       });
 
