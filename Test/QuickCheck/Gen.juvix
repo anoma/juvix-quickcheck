@@ -2,7 +2,7 @@ module Test.QuickCheck.Gen;
 
 open import Data.Random;
 
--- | A generator of values of type A
+--- A generator of values of type A
 type Gen (A : Type) :=
   | gen : (StdGen -> A) -> Gen A;
 
