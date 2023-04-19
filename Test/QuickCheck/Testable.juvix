@@ -38,7 +38,7 @@ forAll {A} {T} (showable show) (testable asProp) g prop :=
         in overFailure
           res
           \ {
-            | (fail s cs) := fail s (show arg :: cs)
+            | (fail (failure s cs)) := fail (failure s (show arg :: cs))
             | s := s
           }
       });
@@ -57,7 +57,7 @@ testableBool : Testable Bool;
 testableBool :=
   let
     toResult : Bool -> Result;
-    toResult b := if b success (fail 0 nil);
+    toResult b := if b success (fail (failure 0 nil));
   in testable
     \ {
       | b := toProp testableResult (toResult b)

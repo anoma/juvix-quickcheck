@@ -9,15 +9,15 @@ type Failure :=
 
 type Result :=
   | success : Result
-  | fail : Nat -> List String -> Result;
+  | fail : Failure -> Result;
 
 isSuccess : Result -> Bool;
 isSuccess success := true;
-isSuccess (fail _ _) := false;
+isSuccess (fail _ ) := false;
 
 showResult : Result -> String;
 showResult success := "success";
-showResult (fail seed cs) :=
+showResult (fail (failure seed cs)) :=
   "failure "
     ++str "(seed : "
     ++str natToString seed
@@ -30,7 +30,7 @@ monoidResult :=
   monoid
     success
     \ {
-      | x@(fail _ _) _ := x
+      | x@(fail _) _ := x
       | _ y := y
     };
 
