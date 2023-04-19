@@ -1,0 +1,44 @@
+name: QuickTest tests
+on: [push]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout our repository
+        uses: actions/checkout@v3
+
+      - name: Cache LLVM and Clang
+        id: cache-llvm
+        uses: actions/cache@v3
+        with:
+          path: |
+            C:/Program Files/LLVM
+            ./llvm
+          key: "${{ runner.os }}-llvm-13"
+
+      - name: Install LLVM and Clang
+        uses: KyleMayes/install-llvm-action@v1
+        with:
+          version: "13.0"
+          cached: "${{ steps.cache-llvm.outputs.cache-hit }}"
+
+      - name: Download and extract wasi-sysroot
+        run: >
+          curl
+          https://github.com/WebAssembly/wasi-sdk/releases/download/wasi-sdk-15/wasi-sysroot-15.0.tar.gz
+          -OL
+          tar xfv wasi-sysroot-15.0.tar.gz
+      - name: Set WASI_SYSROOT_PATH
+        run: |
+          echo "WASI_SYSROOT_PATH=$GITHUB_WORKSPACE/wasi-sysroot" >> $GITHUB_ENV
+
+      - name: Install the latest Juvix compiler
+        uses: jaxxstorm/action-install-gh-release@v1.10.0
+        with:
+          repo: anoma/juvix
+          tag: latest
+          rename-to: juvix
+
+      - name: run quickcheck example
+        run: |
+          make run-quickcheck
