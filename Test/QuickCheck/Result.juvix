@@ -13,7 +13,7 @@ type Result :=
 
 isSuccess : Result -> Bool;
 isSuccess success := true;
-isSuccess (fail _ ) := false;
+isSuccess (fail _) := false;
 
 showResult : Result -> String;
 showResult success := "success";

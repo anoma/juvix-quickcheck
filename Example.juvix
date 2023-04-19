@@ -116,14 +116,15 @@ main : IO;
 main :=
   readLn
     \ {
-      | seed := QC.runTestsIO
-        100
-        (stringToNat seed)
-        (partitionTest
-          :: reverseLengthTest
-          :: reverseReverseIdTest
-          :: splitAtRecombineTest
-          :: mergeSumLengthsTest
-          :: tailLengthOneLessTest
-          :: nil)
+      | seed :=
+        QC.runTestsIO
+          100
+          (stringToNat seed)
+          (partitionTest
+            :: reverseLengthTest
+            :: reverseReverseIdTest
+            :: splitAtRecombineTest
+            :: mergeSumLengthsTest
+            :: tailLengthOneLessTest
+            :: nil)
     };

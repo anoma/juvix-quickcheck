@@ -25,11 +25,12 @@ arbitraryInt :=
   arbitrary
     (gen
       \ {
-        | rand := let
-          runRand : Nat × StdGen := stdNext rand;
-          n : Nat := fst runRand;
-          isPos : Bool := fst (randBool (snd runRand));
-        in if isPos (ofNat n) (negSuc n)
+        | rand :=
+          let
+            runRand : Nat × StdGen := stdNext rand;
+            n : Nat := fst runRand;
+            isPos : Bool := fst (randBool (snd runRand));
+          in if isPos (ofNat n) (negSuc n)
       });
 
 arbitraryBool : Arbitrary Bool;
@@ -55,19 +56,20 @@ arbitraryList {A} (arbitrary g) :=
   arbitrary
     (gen
       \ {
-        | rand := let
-          randSplit : StdGen × StdGen := stdSplit rand;
-          rand1 : StdGen := fst randSplit;
-          rand2 : StdGen := snd randSplit;
-          len : Nat := fst (randNat rand1 0 10);
-          randList : StdGen -> Nat -> List A;
-          randList _ zero := nil;
-          randList r (suc n) :=
-            let
-              rSplit : StdGen × StdGen;
-              rSplit := stdSplit r;
-              r1 : StdGen := fst rSplit;
-              r2 : StdGen := snd rSplit;
-            in runGen g r1 :: randList r2 n;
-        in randList rand2 len
+        | rand :=
+          let
+            randSplit : StdGen × StdGen := stdSplit rand;
+            rand1 : StdGen := fst randSplit;
+            rand2 : StdGen := snd randSplit;
+            len : Nat := fst (randNat rand1 0 10);
+            randList : StdGen -> Nat -> List A;
+            randList _ zero := nil;
+            randList r (suc n) :=
+              let
+                rSplit : StdGen × StdGen;
+                rSplit := stdSplit r;
+                r1 : StdGen := fst rSplit;
+                r2 : StdGen := snd rSplit;
+              in runGen g r1 :: randList r2 n;
+          in randList rand2 len
       });

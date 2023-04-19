@@ -49,28 +49,31 @@ coarbitraryIntInt : CoArbitrary Int Int;
 coarbitraryIntInt :=
   coarbitrary
     \ {
-      | g n := gen
-        \ {
-          | rand := runGen g (perturb n rand)
-        }
+      | g n :=
+        gen
+          \ {
+            | rand := runGen g (perturb n rand)
+          }
     };
 
 coarbitraryIntBool : CoArbitrary Int Bool;
 coarbitraryIntBool :=
   coarbitrary
     \ {
-      | g n := gen
-        \ {
-          | rand := runGen g (perturb n rand)
-        }
+      | g n :=
+        gen
+          \ {
+            | rand := runGen g (perturb n rand)
+          }
     };
 
 coarbitraryListInt : CoArbitrary (List Int) Int;
 coarbitraryListInt :=
   coarbitrary
     \ {
-      | g xs := gen
-        \ {
-          | rand := runGen g (foldr perturb (perturb 0 rand) xs)
-        }
+      | g xs :=
+        gen
+          \ {
+            | rand := runGen g (foldr perturb (perturb 0 rand) xs)
+          }
     };

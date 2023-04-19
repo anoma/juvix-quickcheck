@@ -28,18 +28,19 @@ forAll {A} {T} (showable show) (testable asProp) g prop :=
   property
     (gen
       \ {
-        | rand := let
-          srand : StdGen × StdGen := stdSplit rand;
-          rand1 : StdGen := fst srand;
-          rand2 : StdGen := snd srand;
-          arg : A := runGen g rand1;
-          subProp : Property := asProp (prop arg);
-          res : Result := runProp subProp rand2;
-        in overFailure
-          res
-          \ {
-            | (failure s cs) := failure s (show arg :: cs)
-          }
+        | rand :=
+          let
+            srand : StdGen × StdGen := stdSplit rand;
+            rand1 : StdGen := fst srand;
+            rand2 : StdGen := snd srand;
+            arg : A := runGen g rand1;
+            subProp : Property := asProp (prop arg);
+            res : Result := runProp subProp rand2;
+          in overFailure
+            res
+            \ {
+              | (failure s cs) := failure s (show arg :: cs)
+            }
       });
 
 testableProperty : Testable Property;
@@ -71,7 +72,7 @@ testableFunction :
     -> Argument A
     -> Testable T
     -> Testable (A -> T);
-testableFunction (argument s (arbitrary g)) t@(testable asProp) :=
+testableFunction (argument s (arbitrary g)) t :=
   testable
     \ {
       | f := forAll s t g f
@@ -83,11 +84,19 @@ argumentInt := argument showableInt arbitraryInt;
 argumentNat : Argument Nat;
 argumentNat := argument showableNat arbitraryNat;
 
-argumentList : {A : Type} -> Argument A -> Argument (List A);
-argumentList (argument s a)  := argument (showableList s) (arbitraryList a);
+argumentList :
+  {A : Type} -> Argument A -> Argument (List A);
+argumentList (argument s a) :=
+  argument (showableList s) (arbitraryList a);
 
-argumentFunction : {A : Type} -> {B : Type} -> CoArbitrary A B -> Arbitrary B -> Argument (A -> B);
-argumentFunction coArb arb := argument showableFunction (arbitraryFunction coArb arb);
+argumentFunction :
+  {A : Type}
+    -> {B : Type}
+    -> CoArbitrary A B
+    -> Arbitrary B
+    -> Argument (A -> B);
+argumentFunction coArb arb :=
+  argument showableFunction (arbitraryFunction coArb arb);
 
 testableBinaryInt : Testable (Int -> Int -> Bool);
 testableBinaryInt :=
@@ -97,9 +106,7 @@ testableBinaryInt :=
 
 testableListInt : Testable (List Int -> Bool);
 testableListInt :=
-  testableFunction
-    (argumentList argumentInt)
-    testableBool;
+  testableFunction (argumentList argumentInt) testableBool;
 
 testableListIntListInt :
   Testable (List Int -> List Int -> Bool);
@@ -139,6 +146,4 @@ testableIntIntHofIntInt :
 testableIntIntHofIntInt :=
   testableFunction
     argumentInt
-    (testableFunction
-      argumentInt
-      testableHofIntInt);
+    (testableFunction argumentInt testableHofIntInt);
