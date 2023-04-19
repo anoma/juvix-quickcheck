@@ -62,75 +62,83 @@ testableBool :=
       | b := toProp testableResult (toResult b)
     };
 
+type Argument (A : Type) :=
+  | argument : Showable A -> Arbitrary A -> Argument A;
+
 testableFunction :
   {A : Type}
     -> {T : Type}
-    -> Showable A
-    -> Arbitrary A
+    -> Argument A
     -> Testable T
     -> Testable (A -> T);
-testableFunction s@(showable show) (arbitrary g) t@(testable asProp) :=
+testableFunction (argument s (arbitrary g)) t@(testable asProp) :=
   testable
     \ {
       | f := forAll s t g f
     };
 
+argumentInt : Argument Int;
+argumentInt := argument showableInt arbitraryInt;
+
+argumentNat : Argument Nat;
+argumentNat := argument showableNat arbitraryNat;
+
+argumentList : {A : Type} -> Argument A -> Argument (List A);
+argumentList (argument s a)  := argument (showableList s) (arbitraryList a);
+
+argumentFunction : {A : Type} -> {B : Type} -> CoArbitrary A B -> Arbitrary B -> Argument (A -> B);
+argumentFunction coArb arb := argument showableFunction (arbitraryFunction coArb arb);
+
 testableBinaryInt : Testable (Int -> Int -> Bool);
 testableBinaryInt :=
   testableFunction
-    showableInt
-    arbitraryInt
-    (testableFunction showableInt arbitraryInt testableBool);
+    argumentInt
+    (testableFunction argumentInt testableBool);
 
 testableListInt : Testable (List Int -> Bool);
 testableListInt :=
   testableFunction
-    (showableList showableInt)
-    (arbitraryList arbitraryInt)
+    (argumentList argumentInt)
     testableBool;
 
 testableListIntListInt :
   Testable (List Int -> List Int -> Bool);
 testableListIntListInt :=
   testableFunction
-    (showableList showableInt)
-    (arbitraryList arbitraryInt)
+    (argumentList argumentInt)
     testableListInt;
 
 testableNatListInt : Testable (Nat -> List Int -> Bool);
 testableNatListInt :=
-  testableFunction showableNat arbitraryNat testableListInt;
+  testableFunction argumentNat testableListInt;
 
 testableHofIntBool : Testable ((Int -> Bool) -> Bool);
 testableHofIntBool :=
   let
-    arb : Arbitrary (Int -> Bool);
-    arb := arbitraryFunction coarbitraryIntBool arbitraryBool;
-  in testableFunction showableFunction arb testableBool;
+    arg : Argument (Int -> Bool);
+    arg := argumentFunction coarbitraryIntBool arbitraryBool;
+  in testableFunction arg testableBool;
 
 testableListIntHofIntBool :
   Testable (List Int -> (Int -> Bool) -> Bool);
 testableListIntHofIntBool :=
   testableFunction
-    (showableList showableInt)
-    (arbitraryList arbitraryInt)
+    (argumentList (argumentInt))
     testableHofIntBool;
 
 testableHofIntInt : Testable ((Int -> Int) -> Bool);
 testableHofIntInt :=
   let
-    arb :
-        Arbitrary (Int -> Int) :=
-          arbitraryFunction coarbitraryIntInt arbitraryInt;
-  in testableFunction showableFunction arb testableBool;
+    arg :
+        Argument (Int -> Int) :=
+          argumentFunction coarbitraryIntInt arbitraryInt;
+  in testableFunction arg testableBool;
 
 testableIntIntHofIntInt :
   Testable (Int -> Int -> (Int -> Int) -> Bool);
 testableIntIntHofIntInt :=
   testableFunction
-    showableInt
-    arbitraryInt
+    argumentInt
     (testableFunction
-      showableInt
-      arbitraryInt
+      argumentInt
       testableHofIntInt);
