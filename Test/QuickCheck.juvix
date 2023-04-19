@@ -26,7 +26,7 @@ quickcheck attemptNum startSeed t predicate :=
       in overFailure
         result
         \ {
-          | (failure _ cs) := failure seed cs
+          | (fail _ cs) := fail seed cs
           | s := s
         };
     runAll : Property -> Result;

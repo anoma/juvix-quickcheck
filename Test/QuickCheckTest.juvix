@@ -3,8 +3,9 @@ module Test.QuickCheckTest;
 open import Stdlib.Prelude;
 open import Data.List;
 open import Data.String;
-open import Stdlib.Debug.Fail;
 open import Test.QuickCheck public;
+
+import Stdlib.Debug.Fail as Fail;
 
 -- | The data defining a QuickCheck test
 type Test :=
@@ -55,4 +56,4 @@ runTestsIO attemptNum startSeed ts :=
     >> if
       (allTestSuccess results)
       (printStringLn "All tests passed")
-      (fail "Test failed");
+      (Fail.fail "Test failed");

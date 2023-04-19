@@ -4,17 +4,20 @@ open import Stdlib.Prelude;
 open import Data.Monoid;
 open import Data.String;
 
+type Failure :=
+  | failure : Nat -> List String -> Failure;
+
 type Result :=
   | success : Result
-  | failure : Nat -> List String -> Result;
+  | fail : Nat -> List String -> Result;
 
 isSuccess : Result -> Bool;
 isSuccess success := true;
-isSuccess (failure _ _) := false;
+isSuccess (fail _ _) := false;
 
 showResult : Result -> String;
 showResult success := "success";
-showResult (failure seed cs) :=
+showResult (fail seed cs) :=
   "failure "
     ++str "(seed : "
     ++str natToString seed
@@ -27,7 +30,7 @@ monoidResult :=
   monoid
     success
     \ {
-      | x@(failure _ _) _ := x
+      | x@(fail _ _) _ := x
       | _ y := y
     };
 
