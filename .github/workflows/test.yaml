@@ -40,5 +40,5 @@ jobs:
       - name: run quickcheck example
         run: |
           juvix-linux_x86_64-v0.3.2 --version
-          cp `which juvix-linux_x86_64-v0.3.2` /usr/bin/juvix
+          sudo cp `which juvix-linux_x86_64-v0.3.2` /usr/bin/juvix
           make run-quickcheck
