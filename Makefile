@@ -4,7 +4,7 @@ all: run-quickcheck
 deps/stdlib:
 	@mkdir -p deps/
 	@git clone https://github.com/anoma/juvix-stdlib.git deps/stdlib
-	@git -C deps/stdlib checkout 059d502b1f989faed5470271e97571c2b1deaa10
+	@git -C deps/stdlib checkout 24813f5c1a8b8b3450c5213c5f947d0356680a78
 
 build/Random: Data/Random.juvix deps/stdlib
 	juvix compile Data/Random.juvix -o build/Random
