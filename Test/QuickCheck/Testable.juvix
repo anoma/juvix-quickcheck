@@ -89,6 +89,9 @@ argumentList :
 argumentList (argument s a) :=
   argument (showableList s) (arbitraryList a);
 
+argumentListInt : Argument (List Int);
+argumentListInt := argumentList argumentInt;
+
 argumentFunction :
   {A : Type}
     -> {B : Type}
@@ -97,6 +100,15 @@ argumentFunction :
     -> Argument (A -> B);
 argumentFunction coArb arb :=
   argument showableFunction (arbitraryFunction coArb arb);
+
+argumentIntInt : Argument (Int -> Int);
+argumentIntInt :=
+  argumentFunction coarbitraryIntInt arbitraryInt;
+
+argumentIntIntInt : Argument (Int -> Int -> Int);
+argumentIntIntInt :=
+  case argumentIntInt
+    | (argument _ arbIntInt) := argumentFunction coarbitraryIntIntHof arbIntInt;
 
 testableBinaryInt : Testable (Int -> Int -> Bool);
 testableBinaryInt :=
@@ -147,3 +159,12 @@ testableIntIntHofIntInt :=
   testableFunction
     argumentInt
     (testableFunction argumentInt testableHofIntInt);
+
+testableHofIntIntListIntListInt :
+  Testable ((Int -> Int -> Int) -> List Int -> List Int -> Bool);
+testableHofIntIntListIntListInt :=
+  testableFunction
+    argumentIntIntInt
+    (testableFunction
+      argumentListInt
+      (testableFunction argumentListInt testableBool));
