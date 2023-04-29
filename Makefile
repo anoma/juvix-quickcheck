@@ -8,7 +8,7 @@ deps/stdlib:
 
 deps/traits:
 	@mkdir -p deps/
-	@git clone --branch main --depth 1 https://github.com/paulcadman/traits.git deps/traits
+	@git clone --branch v0.1.0 --depth 1 https://github.com/paulcadman/traits.git deps/traits
 
 .PHONY: deps
 deps: deps/traits deps/stdlib
