@@ -1,11 +1,11 @@
 module Data.String;
 
 open import Stdlib.Prelude;
-open import Data.Monoid;
+import Data.Monoid as Monoid;
 
 intercalate : String → List String → String;
 intercalate sep xs :=
-  mconcat monoidString (intersperse sep xs);
+  Monoid.mconcat Monoid.string (intersperse sep xs);
 
 lines : List String -> String;
 lines := intercalate "\n";

@@ -6,11 +6,18 @@ deps/stdlib:
 	@git clone https://github.com/anoma/juvix-stdlib.git deps/stdlib
 	@git -C deps/stdlib checkout 24813f5c1a8b8b3450c5213c5f947d0356680a78
 
-build/Random: Data/Random.juvix deps/stdlib
+deps/traits:
+	@mkdir -p deps/
+	@git clone --branch main --depth 1 https://github.com/paulcadman/traits.git deps/traits
+
+.PHONY: deps
+deps: deps/traits deps/stdlib
+
+build/Random: Data/Random.juvix deps
 	juvix compile Data/Random.juvix -o build/Random
 	@rm $(TEMP_FILE)
 
-build/Example: $(wildcard ./**/*.juvix) Example.juvix deps/stdlib
+build/Example: $(wildcard ./**/*.juvix) Example.juvix deps
 	@mkdir -p build
 	juvix compile Example.juvix -o build/Example
 
