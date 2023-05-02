@@ -56,6 +56,17 @@ coarbitraryIntInt :=
           }
     };
 
+coarbitraryIntIntHof : CoArbitrary Int (Int -> Int);
+coarbitraryIntIntHof :=
+  coarbitrary
+    \ {
+      | g n :=
+        gen
+          \ {
+            | rand := runGen g (perturb n rand)
+          }
+    };
+
 coarbitraryIntBool : CoArbitrary Int Bool;
 coarbitraryIntBool :=
   coarbitrary
