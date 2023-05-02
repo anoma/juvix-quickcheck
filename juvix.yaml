@@ -1,2 +1,5 @@
 name: quickcheck
 version: 0.2.0
+dependencies:
+  - deps/stdlib
+  - deps/traits

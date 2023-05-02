@@ -5,9 +5,6 @@ open import Stdlib.Data.Ord;
 
 import Stdlib.Data.Int.Ord as Int;
 
-snoc : {A : Type} -> List A -> A -> List A;
-snoc xs x := xs ++ x :: nil;
-
 rangeStep : Nat -> Nat -> List Nat;
 rangeStep step n :=
   let
@@ -15,32 +12,6 @@ rangeStep step n :=
     go zero xs := xs;
     go (suc n) xs := go n (n * step :: xs);
   in go n nil;
-
-zip :
-  {A : Type}
-    -> {B : Type}
-    -> List A
-    -> List B
-    -> List (A × B);
-zip (x :: xs) (y :: ys) := (x, y) :: zip xs ys;
-zip _ nil := nil;
-zip nil _ := nil;
-
-zipWith :
-  {A : Type}
-    -> {B : Type}
-    -> {C : Type}
-    -> (A -> B -> C)
-    -> List A
-    -> List B
-    -> List C;
-zipWith {A} {B} {C} f as bs :=
-  let
-    go : List A -> List B -> List C;
-    go _ nil := nil;
-    go nil _ := nil;
-    go (a :: as) (b :: bs) := f a b :: go as bs;
-  in go as bs;
 
 unzipWith :
   {A : Type}
@@ -57,21 +28,8 @@ range n := rangeStep 1 n;
 qsHelper : {A : Type} → A → List A × List A → List A;
 qsHelper a (l, r) := l ++ (a :: nil) ++ r;
 
-terminating
-quickSort :
-  {A : Type} → (A → A → Ordering) → List A → List A;
-quickSort _ nil := nil;
-quickSort _ (x :: nil) := x :: nil;
-quickSort cmp (x :: xs) :=
-  qsHelper
-    x
-    (both (quickSort cmp) (partition (isGT ∘ cmp x) xs));
-
 sortInt : List Int -> List Int;
 sortInt := quickSort Int.compare;
-
-all : {A : Type} -> (A -> Bool) -> List A -> Bool;
-all p xs := foldl and true (map p xs);
 
 eqListInt : List Int -> List Int -> Bool;
 eqListInt nil nil := true;

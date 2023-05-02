@@ -2,12 +2,13 @@ module Test.QuickCheck.Testable;
 
 open import Stdlib.Prelude;
 open import Data.Random;
-open import Data.Showable;
 open import Test.QuickCheck.Arbitrary;
 open import Test.QuickCheck.CoArbitrary;
 open import Test.QuickCheck.Result;
 open import Test.QuickCheck.Property;
 open import Test.QuickCheck.Gen;
+import Data.Show as Show;
+open Show using {Show;show};
 
 --- A conversion from a Type A to a ;Property;
 type Testable (A : Type) :=
@@ -19,12 +20,12 @@ toProp (testable f) := f;
 forAll :
   {A : Type}
     -> {T : Type}
-    -> Showable A
+    -> Show A
     -> Testable T
     -> Gen A
     -> (A -> T)
     -> Property;
-forAll {A} {T} (showable show) (testable asProp) g prop :=
+forAll {A} {T} (show to-str) (testable asProp) g prop :=
   property
     (gen
       \ {
@@ -39,7 +40,7 @@ forAll {A} {T} (showable show) (testable asProp) g prop :=
           in overFailure
             res
             \ {
-              | (failure s cs) := failure s (show arg :: cs)
+              | (failure s cs) := failure s (to-str arg :: cs)
             }
       });
 
@@ -64,7 +65,7 @@ testableBool :=
     };
 
 type Argument (A : Type) :=
-  | argument : Showable A -> Arbitrary A -> Argument A;
+  | argument : Show A -> Arbitrary A -> Argument A;
 
 testableFunction :
   {A : Type}
@@ -79,15 +80,18 @@ testableFunction (argument s (arbitrary g)) t :=
     };
 
 argumentInt : Argument Int;
-argumentInt := argument showableInt arbitraryInt;
+argumentInt := argument Show.int arbitraryInt;
 
 argumentNat : Argument Nat;
-argumentNat := argument showableNat arbitraryNat;
+argumentNat := argument Show.nat arbitraryNat;
 
 argumentList :
   {A : Type} -> Argument A -> Argument (List A);
 argumentList (argument s a) :=
-  argument (showableList s) (arbitraryList a);
+  argument (Show.list s) (arbitraryList a);
+
+showableFunction : {A B : Type} -> Show (A -> B);
+showableFunction := Show.show (const "function");
 
 argumentFunction :
   {A : Type}

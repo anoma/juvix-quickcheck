@@ -1,2 +1,4 @@
 .juvix-build
 .history
+build/
+deps/
