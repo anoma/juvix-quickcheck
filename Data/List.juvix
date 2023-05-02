@@ -1,7 +1,7 @@
 module Data.List;
 
 open import Stdlib.Prelude;
-open import Stdlib.Data.Ord;
+open import Stdlib.Trait.Ord;
 
 import Stdlib.Data.Int.Ord as Int;
 

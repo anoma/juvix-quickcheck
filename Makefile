@@ -3,14 +3,10 @@ all: run-quickcheck
 
 deps/stdlib:
 	@mkdir -p deps/
-	@git clone https://github.com/anoma/juvix-stdlib.git deps/stdlib
-
-deps/traits:
-	@mkdir -p deps/
-	@git clone --branch v0.1.0 --depth 1 https://github.com/paulcadman/traits.git deps/traits
+	@git clone --branch traits --depth 1 https://github.com/anoma/juvix-stdlib.git deps/stdlib
 
 .PHONY: deps
-deps: deps/traits deps/stdlib
+deps: deps/stdlib
 
 build/Random: Data/Random.juvix deps
 	juvix compile Data/Random.juvix -o build/Random
