@@ -4,10 +4,6 @@ open import Stdlib.Prelude hiding {mod};
 open import Stdlib.Data.Int.Ord;
 open import Stdlib.Data.Int;
 
-abs : Int -> Nat;
-abs (ofNat n) := n;
-abs (negSuc n) := suc n;
-
 gcd : Int → Int → Int;
 gcd a b :=
   let
