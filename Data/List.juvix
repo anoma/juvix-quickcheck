@@ -1,9 +1,8 @@
 module Data.List;
 
 open import Stdlib.Prelude;
-open import Stdlib.Trait.Ord;
-
 import Stdlib.Data.Int.Ord as Int;
+open import Stdlib.Trait.Ord;
 
 rangeStep : Nat -> Nat -> List Nat;
 rangeStep step n :=
@@ -29,7 +28,7 @@ qsHelper : {A : Type} → A → List A × List A → List A;
 qsHelper a (l, r) := l ++ (a :: nil) ++ r;
 
 sortInt : List Int -> List Int;
-sortInt := quickSort Int.compare;
+sortInt := quickSort IntTraits.Ord;
 
 eqListInt : List Int -> List Int -> Bool;
 eqListInt nil nil := true;

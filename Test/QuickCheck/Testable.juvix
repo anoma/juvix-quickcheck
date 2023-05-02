@@ -26,7 +26,7 @@ forAll :
     -> Gen A
     -> (A -> T)
     -> Property;
-forAll {A} {T} (show to-str) (testable asProp) g prop :=
+forAll {A} {T} (mkShow to-str) (testable asProp) g prop :=
   property
     (gen
       \ {
@@ -92,7 +92,7 @@ argumentList (argument s a) :=
   argument (ListTraits.Show s) (arbitraryList a);
 
 showableFunction : {A B : Type} -> Show (A -> B);
-showableFunction := Show.show (const "function");
+showableFunction := Show.mkShow (const "function");
 
 argumentListInt : Argument (List Int);
 argumentListInt := argumentList argumentInt;
