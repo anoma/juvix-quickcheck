@@ -3,7 +3,7 @@ all: run-quickcheck
 
 deps/stdlib:
 	@mkdir -p deps/
-	@git clone https://github.com/anoma/juvix-stdlib.git deps/stdlib
+	@git clone --branch add-functions --depth 1 https://github.com/anoma/juvix-stdlib.git deps/stdlib
 
 deps/traits:
 	@mkdir -p deps/
