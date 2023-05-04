@@ -34,7 +34,7 @@ prop-splitAtRecombine n xs :=
 prop-mergeSumLengths : List Int -> List Int -> Bool;
 prop-mergeSumLengths xs ys :=
   length xs Nat.+ length ys
-    Nat.== length (merge compare xs ys);
+    Nat.== length (merge IntTraits.Ord xs ys);
 
 prop-partition : List Int -> (Int -> Bool) -> Bool;
 prop-partition xs p :=

@@ -7,8 +7,6 @@ open import Test.QuickCheck.CoArbitrary;
 open import Test.QuickCheck.Result;
 open import Test.QuickCheck.Property;
 open import Test.QuickCheck.Gen;
-import Data.Show as Show;
-open Show using {Show;show};
 
 --- A conversion from a Type A to a ;Property;
 type Testable (A : Type) :=
@@ -25,7 +23,7 @@ forAll :
     -> Gen A
     -> (A -> T)
     -> Property;
-forAll {A} {T} (show to-str) (testable asProp) g prop :=
+forAll {A} {T} (mkShow to-str) (testable asProp) g prop :=
   property
     (gen
       \ {
@@ -80,18 +78,18 @@ testableFunction (argument s (arbitrary g)) t :=
     };
 
 argumentInt : Argument Int;
-argumentInt := argument Show.int arbitraryInt;
+argumentInt := argument IntTraits.Show arbitraryInt;
 
 argumentNat : Argument Nat;
-argumentNat := argument Show.nat arbitraryNat;
+argumentNat := argument NatTraits.Show arbitraryNat;
 
 argumentList :
   {A : Type} -> Argument A -> Argument (List A);
 argumentList (argument s a) :=
-  argument (Show.list s) (arbitraryList a);
+  argument (ListTraits.Show s) (arbitraryList a);
 
 showableFunction : {A B : Type} -> Show (A -> B);
-showableFunction := Show.show (const "function");
+showableFunction := mkShow (const "function");
 
 argumentListInt : Argument (List Int);
 argumentListInt := argumentList argumentInt;
