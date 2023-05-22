@@ -1,8 +1,8 @@
 module Test.QuickCheck.Property;
 
-open import Data.Random;
-open import Test.QuickCheck.Gen;
-open import Test.QuickCheck.Result;
+import Data.Random open;
+import Test.QuickCheck.Gen open;
+import Test.QuickCheck.Result open;
 
 --- A testable predicate from which we can obtain a ;Gen
   Result;

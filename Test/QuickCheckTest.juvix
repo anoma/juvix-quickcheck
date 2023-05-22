@@ -1,9 +1,9 @@
 module Test.QuickCheckTest;
 
-open import Stdlib.Prelude;
-open import Data.List;
-open import Data.String;
-open import Test.QuickCheck public;
+import Stdlib.Prelude open;
+import Data.List open;
+import Data.String open;
+import Test.QuickCheck open public;
 
 import Stdlib.Debug.Fail as Fail;
 

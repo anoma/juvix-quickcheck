@@ -1,10 +1,10 @@
 module Test.QuickCheck.CoArbitrary;
 
-open import Data.Random;
-open import Data.Int;
-open import Stdlib.Prelude;
-open import Test.QuickCheck.Gen;
-open import Stdlib.Data.Int.Ord;
+import Data.Random open;
+import Data.Int open;
+import Stdlib.Prelude open;
+import Test.QuickCheck.Gen open;
+import Stdlib.Data.Int.Ord open;
 
 import Stdlib.Data.Nat as Nat;
 import Stdlib.Data.Nat.Ord as Nat;
@@ -33,58 +33,30 @@ perturb n rand0 :=
     terminating
     digitsParity : List Bool;
     digitsParity :=
-      map
-        \ {
-          | x := x Nat.== 0
-        }
-        (binaryDigits (abs n));
+      map \ {x := x Nat.== 0} (binaryDigits (abs n));
   in foldl
-    \ {
-      | rand b := vary b rand
-    }
+    \ {rand b := vary b rand}
     (vary (n < 0) rand0)
     digitsParity;
 
 coarbitraryIntInt : CoArbitrary Int Int;
 coarbitraryIntInt :=
   coarbitrary
-    \ {
-      | g n :=
-        gen
-          \ {
-            | rand := runGen g (perturb n rand)
-          }
-    };
+    \ {g n := gen \ {rand := runGen g (perturb n rand)}};
 
 coarbitraryIntIntHof : CoArbitrary Int (Int -> Int);
 coarbitraryIntIntHof :=
   coarbitrary
-    \ {
-      | g n :=
-        gen
-          \ {
-            | rand := runGen g (perturb n rand)
-          }
-    };
+    \ {g n := gen \ {rand := runGen g (perturb n rand)}};
 
 coarbitraryIntBool : CoArbitrary Int Bool;
 coarbitraryIntBool :=
   coarbitrary
-    \ {
-      | g n :=
-        gen
-          \ {
-            | rand := runGen g (perturb n rand)
-          }
-    };
+    \ {g n := gen \ {rand := runGen g (perturb n rand)}};
 
 coarbitraryListInt : CoArbitrary (List Int) Int;
 coarbitraryListInt :=
   coarbitrary
-    \ {
-      | g xs :=
-        gen
-          \ {
-            | rand := runGen g (foldr perturb (perturb 0 rand) xs)
-          }
-    };
+    \ {g xs :=
+      gen
+        \ {rand := runGen g (foldr perturb (perturb 0 rand) xs)}};

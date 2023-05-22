@@ -3,8 +3,8 @@
 -- The period of the generator is approximately 8 x 10^12 with 32362 possible output values.
 module Data.Random;
 
-open import Stdlib.Prelude;
-open import Stdlib.Data.Nat.Ord;
+import Stdlib.Prelude open;
+import Stdlib.Data.Nat.Ord open;
 
 import Stdlib.Data.Int as Int;
 open Int using {Int};

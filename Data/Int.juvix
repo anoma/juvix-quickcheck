@@ -1,8 +1,8 @@
 module Data.Int;
 
-open import Stdlib.Prelude hiding {mod};
-open import Stdlib.Data.Int.Ord;
-open import Stdlib.Data.Int;
+import Stdlib.Prelude open hiding {mod};
+import Stdlib.Data.Int.Ord open;
+import Stdlib.Data.Int open;
 
 gcd : Int → Int → Int;
 gcd a b :=

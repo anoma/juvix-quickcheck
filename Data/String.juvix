@@ -1,6 +1,7 @@
 module Data.String;
 
-open import Stdlib.Prelude;
+import Stdlib.Prelude open;
+
 import Data.Monoid as Monoid;
 
 intercalate : String → List String → String;

@@ -1,12 +1,12 @@
 module Test.QuickCheck.Testable;
 
-open import Stdlib.Prelude;
-open import Data.Random;
-open import Test.QuickCheck.Arbitrary;
-open import Test.QuickCheck.CoArbitrary;
-open import Test.QuickCheck.Result;
-open import Test.QuickCheck.Property;
-open import Test.QuickCheck.Gen;
+import Stdlib.Prelude open;
+import Data.Random open;
+import Test.QuickCheck.Arbitrary open;
+import Test.QuickCheck.CoArbitrary open;
+import Test.QuickCheck.Result open;
+import Test.QuickCheck.Property open;
+import Test.QuickCheck.Gen open;
 
 --- A conversion from a Type A to a ;Property;
 type Testable (A : Type) :=
@@ -26,41 +26,31 @@ forAll :
 forAll {A} {T} (mkShow to-str) (testable asProp) g prop :=
   property
     (gen
-      \ {
-        | rand :=
-          let
-            srand : StdGen × StdGen := stdSplit rand;
-            rand1 : StdGen := fst srand;
-            rand2 : StdGen := snd srand;
-            arg : A := runGen g rand1;
-            subProp : Property := asProp (prop arg);
-            res : Result := runProp subProp rand2;
-          in overFailure
-            res
-            \ {
-              | (failure s cs) := failure s (to-str arg :: cs)
-            }
-      });
+      \ {rand :=
+        let
+          srand : StdGen × StdGen := stdSplit rand;
+          rand1 : StdGen := fst srand;
+          rand2 : StdGen := snd srand;
+          arg : A := runGen g rand1;
+          subProp : Property := asProp (prop arg);
+          res : Result := runProp subProp rand2;
+        in overFailure
+          res
+          \ {(failure s cs) := failure s (to-str arg :: cs)}});
 
 testableProperty : Testable Property;
 testableProperty := testable id;
 
 testableResult : Testable Result;
 testableResult :=
-  testable
-    \ {
-      | r := property (gen (const r))
-    };
+  testable \ {r := property (gen (const r))};
 
 testableBool : Testable Bool;
 testableBool :=
   let
     toResult : Bool -> Result;
     toResult b := if b success (fail (failure 0 nil));
-  in testable
-    \ {
-      | b := toProp testableResult (toResult b)
-    };
+  in testable \ {b := toProp testableResult (toResult b)};
 
 type Argument (A : Type) :=
   | argument : Show A -> Arbitrary A -> Argument A;
@@ -72,10 +62,7 @@ testableFunction :
     -> Testable T
     -> Testable (A -> T);
 testableFunction (argument s (arbitrary g)) t :=
-  testable
-    \ {
-      | f := forAll s t g f
-    };
+  testable \ {f := forAll s t g f};
 
 argumentInt : Argument Int;
 argumentInt := argument IntTraits.Show arbitraryInt;
@@ -110,7 +97,8 @@ argumentIntInt :=
 argumentIntIntInt : Argument (Int -> Int -> Int);
 argumentIntIntInt :=
   case argumentIntInt
-    | (argument _ arbIntInt) := argumentFunction coarbitraryIntIntHof arbIntInt;
+    | argument _ arbIntInt :=
+      argumentFunction coarbitraryIntIntHof arbIntInt;
 
 testableBinaryInt : Testable (Int -> Int -> Bool);
 testableBinaryInt :=
@@ -163,7 +151,8 @@ testableIntIntHofIntInt :=
     (testableFunction argumentInt testableHofIntInt);
 
 testableHofIntIntListIntListInt :
-  Testable ((Int -> Int -> Int) -> List Int -> List Int -> Bool);
+  Testable
+    ((Int -> Int -> Int) -> List Int -> List Int -> Bool);
 testableHofIntIntListIntListInt :=
   testableFunction
     argumentIntIntInt

@@ -1,6 +1,6 @@
 module Test.QuickCheck.Gen;
 
-open import Data.Random;
+import Data.Random open;
 
 --- A generator of values of type A
 type Gen (A : Type) :=
@@ -11,8 +11,4 @@ runGen (gen f) := f;
 
 promote :
   {A : Type} -> {B : Type} -> (A -> Gen B) -> Gen (A -> B);
-promote f :=
-  gen
-    \ {
-      | rand a := runGen (f a) rand
-    };
+promote f := gen \ {rand a := runGen (f a) rand};

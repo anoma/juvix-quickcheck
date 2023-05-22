@@ -1,15 +1,15 @@
 module Example;
 
-open import Stdlib.Prelude hiding {+};
+import Stdlib.Prelude open hiding {+};
 
 import Stdlib.Data.Nat.Ord as Nat;
 import Stdlib.Data.Nat as Nat;
 
-open import Stdlib.Data.Int.Ord;
-open import Stdlib.Data.Int;
-open import Data.List;
-open import Data.String;
-open import Data.Int;
+import Stdlib.Data.Int.Ord open;
+import Stdlib.Data.Int open;
+import Data.List open;
+import Data.String open;
+import Data.Int open;
 
 import Test.QuickCheckTest as QC;
 
@@ -115,16 +115,14 @@ tailLengthOneLessTest :=
 main : IO;
 main :=
   readLn
-    \ {
-      | seed :=
-        QC.runTestsIO
-          100
-          (stringToNat seed)
-          (partitionTest
-            :: reverseLengthTest
-            :: reverseReverseIdTest
-            :: splitAtRecombineTest
-            :: mergeSumLengthsTest
-            :: tailLengthOneLessTest
-            :: nil)
-    };
+    \ {seed :=
+      QC.runTestsIO
+        100
+        (stringToNat seed)
+        (partitionTest
+          :: reverseLengthTest
+          :: reverseReverseIdTest
+          :: splitAtRecombineTest
+          :: mergeSumLengthsTest
+          :: tailLengthOneLessTest
+          :: nil)};

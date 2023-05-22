@@ -1,8 +1,8 @@
 module Test.QuickCheck.Result;
 
-open import Stdlib.Prelude;
-open import Data.Monoid;
-open import Data.String;
+import Stdlib.Prelude open;
+import Data.Monoid open;
+import Data.String open;
 
 type Failure :=
   | failure : Nat -> List String -> Failure;

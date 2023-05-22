@@ -1,12 +1,12 @@
 module Test.QuickCheck;
 
-open import Stdlib.Prelude;
-open import Data.List;
-open import Data.Monoid;
-open import Data.Random;
-open import Test.QuickCheck.Property public;
-open import Test.QuickCheck.Result public;
-open import Test.QuickCheck.Testable public;
+import Stdlib.Prelude open;
+import Data.List open;
+import Data.Monoid open;
+import Data.Random open;
+import Test.QuickCheck.Property open public;
+import Test.QuickCheck.Result open public;
+import Test.QuickCheck.Testable open public;
 
 quickcheck :
   {Predicate : Type}
@@ -23,11 +23,7 @@ quickcheck attemptNum startSeed t predicate :=
     runOne prop seed :=
       let
         result : Result := runProp prop (mkStdGen seed);
-      in overFailure
-        result
-        \ {
-          | (failure _ cs) := failure seed cs
-        };
+      in overFailure result \ {(failure _ cs) := failure seed cs};
     runAll : Property -> Result;
     runAll prop := foldMap monoidResult (runOne prop) seeds;
   in runAll (toProp t predicate);
