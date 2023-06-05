@@ -44,14 +44,14 @@ runTests attemptNum startSeed ts :=
     numTests : Nat := length ts;
     testSeeds : List Nat;
     testSeeds :=
-      map ((+) startSeed) (rangeStep attemptNum numTests);
+      map (n in rangeStep attemptNum numTests) startSeed + n;
   in zipWith (runTest attemptNum) testSeeds ts;
 
 runTestsIO : Nat -> Nat -> List Test -> IO;
 runTestsIO attemptNum startSeed ts :=
   let
     results :
-        List TestResult := runTests attemptNum startSeed ts;
+      List TestResult := runTests attemptNum startSeed ts;
   in printStringLn (lines (map showTestResult results))
     >> if
       (allTestSuccess results)

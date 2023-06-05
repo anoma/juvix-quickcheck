@@ -18,7 +18,7 @@ quickcheck :
 quickcheck attemptNum startSeed t predicate :=
   let
     seeds : List Nat;
-    seeds := map ((+) startSeed) (range attemptNum);
+    seeds := map (n in range attemptNum) (startSeed + n);
     runOne : Property -> Nat -> Result;
     runOne prop seed :=
       let

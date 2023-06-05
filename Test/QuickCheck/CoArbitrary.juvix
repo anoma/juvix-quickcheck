@@ -32,12 +32,9 @@ perturb n rand0 :=
       in if b (snd splitG) (fst splitG);
     terminating
     digitsParity : List Bool;
-    digitsParity :=
-      map \ {x := x Nat.== 0} (binaryDigits (abs n));
-  in foldl
-    \ {rand b := vary b rand}
-    (vary (n < 0) rand0)
-    digitsParity;
+    digitsParity := map (x in binaryDigits (abs n)) x Nat.== 0;
+  in for (rand := vary (n < 0) rand0) (b in digitsParity)
+       vary b rand;
 
 coarbitraryIntInt : CoArbitrary Int Int;
 coarbitraryIntInt :=
