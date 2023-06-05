@@ -50,23 +50,23 @@ stdNext (stdGen s1Nat s2Nat s3Nat) :=
     s3 : Int := ofNat s3Nat;
     k : Int := Int.div s1 206;
     s1' :
-        Int := 157 Int.* (s1 Int.- k Int.* 206) Int.- k Int.* 21;
+      Int := 157 Int.* (s1 Int.- k Int.* 206) Int.- k Int.* 21;
     s1'' : Int := if (s1' Int.< 0) (s1' Int.+ 32363) s1';
     k' : Int := Int.div s2 217;
     s2' :
-        Int :=
-          146 Int.* (s2 Int.- k' Int.* 217) Int.- k' Int.* 45;
+      Int :=
+        146 Int.* (s2 Int.- k' Int.* 217) Int.- k' Int.* 45;
     s2'' : Int := if (s2' Int.< 0) (s2' Int.+ 31727) s2';
     k'' : Int := Int.div s3 222;
     s3' :
-        Int :=
-          142 Int.* (s3 Int.- k' Int.* 222) Int.- k' Int.* 133;
+      Int :=
+        142 Int.* (s3 Int.- k' Int.* 222) Int.- k' Int.* 133;
     s3'' : Int := if (s2' Int.< 0) (s2' Int.+ 31657) s3';
     z : Int := s1'' Int.- s2'';
     z' : Int := if (z Int.> 706) (z Int.- 32362) z;
     z'' :
-        Int :=
-          if (z' Int.< 1) (z' Int.+ 32362) (Int.mod z (ofNat k1));
+      Int :=
+        if (z' Int.< 1) (z' Int.+ 32362) (Int.mod z (ofNat k1));
   in toNat z'', stdGen (toNat s1'') (toNat s2'') (toNat s3'');
 
 stdSplit : StdGen -> StdGen × StdGen;
@@ -77,7 +77,7 @@ stdSplit g@(stdGen s1 s2 s3) :=
     newS3 : Nat := if (s3 == k3) 1 (s3 + 1);
     newG : StdGen := snd (stdNext g);
     leftG :
-        StdGen := stdGen newS1 (stdGenS2 newG) (stdGenS3 newG);
+      StdGen := stdGen newS1 (stdGenS2 newG) (stdGenS3 newG);
     rightG : StdGen := stdGen (stdGenS1 newG) newS2 newS3;
   in leftG, rightG;
 
