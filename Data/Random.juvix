@@ -6,8 +6,7 @@ module Data.Random;
 import Stdlib.Prelude open;
 import Stdlib.Data.Nat.Ord open;
 
-import Stdlib.Data.Int as Int;
-open Int using {Int};
+import Stdlib.Data.Int as Int open using {Int};
 
 import Stdlib.Data.Int.Ord as Int;
 
