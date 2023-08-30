@@ -7,9 +7,9 @@ import Stdlib.Data.Int.Ord as Int;
 rangeStep : Nat -> Nat -> List Nat
   | step n :=
     let
-      go : Nat -> List Nat -> List Nat;
-      go zero xs := xs;
-      go (suc n) xs := go n (n * step :: xs);
+      go : Nat -> List Nat -> List Nat
+        | zero xs := xs
+        | (suc n) xs := go n (n * step :: xs);
     in go n nil;
 
 unzipWith

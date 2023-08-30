@@ -17,22 +17,23 @@ binaryDigits : Nat -> List Nat
   | n :=
     let
       terminating
-      go : Nat -> List Nat;
-      go n :=
-        if (n Nat.== 0) nil (Nat.mod n 2 :: go (Nat.div n 2));
+      go : Nat -> List Nat
+        | n :=
+          if (n Nat.== 0) nil (Nat.mod n 2 :: go (Nat.div n 2));
     in reverse (go n);
 
 perturb : Int -> StdGen -> StdGen
   | n rand0 :=
     let
-      vary : Bool -> StdGen -> StdGen;
-      vary b g :=
-        let
-          splitG : StdGen × StdGen := stdSplit g;
-        in if b (snd splitG) (fst splitG);
+      vary : Bool -> StdGen -> StdGen
+        | b g :=
+          let
+            splitG : StdGen × StdGen := stdSplit g;
+          in if b (snd splitG) (fst splitG);
       terminating
-      digitsParity : List Bool;
-      digitsParity := map (x in binaryDigits (abs n)) x Nat.== 0;
+      digitsParity : List Bool :=
+        map (x in binaryDigits (abs n))
+          x Nat.== 0;
     in for (rand := vary (n < 0) rand0) (b in digitsParity)
          vary b rand;
 

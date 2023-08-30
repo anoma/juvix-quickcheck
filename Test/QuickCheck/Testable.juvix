@@ -45,8 +45,8 @@ testableResult : Testable Result :=
 
 testableBool : Testable Bool :=
   let
-    toResult : Bool -> Result;
-    toResult b := if b success (fail (failure 0 nil));
+    toResult : Bool -> Result
+      | b := if b success (fail (failure 0 nil));
   in testable \ {b := toProp testableResult (toResult b)};
 
 type Argument (A : Type) :=
@@ -113,8 +113,8 @@ testableNatListInt : Testable (Nat -> List Int -> Bool) :=
 
 testableHofIntBool : Testable ((Int -> Bool) -> Bool) :=
   let
-    arg : Argument (Int -> Bool);
-    arg := argumentFunction coarbitraryIntBool arbitraryBool;
+    arg : Argument (Int -> Bool) :=
+      argumentFunction coarbitraryIntBool arbitraryBool;
   in testableFunction arg testableBool;
 
 testableListIntHofIntBool
@@ -125,9 +125,8 @@ testableListIntHofIntBool
 
 testableHofIntInt : Testable ((Int -> Int) -> Bool) :=
   let
-    arg :
-      Argument (Int -> Int) :=
-        argumentFunction coarbitraryIntInt arbitraryInt;
+    arg : Argument (Int -> Int) :=
+      argumentFunction coarbitraryIntInt arbitraryInt;
   in testableFunction arg testableBool;
 
 testableIntIntHofIntInt

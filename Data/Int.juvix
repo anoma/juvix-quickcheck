@@ -8,6 +8,6 @@ gcd : Int → Int → Int
   | a b :=
     let
       terminating
-      gcd' : Int -> Int -> Int;
-      gcd' a b := if (a == 0) b (gcd' (mod b a) a);
+      gcd' : Int -> Int -> Int
+        | a b := if (a == 0) b (gcd' (mod b a) a);
     in if (a > b) (gcd' b a) (gcd' a b);

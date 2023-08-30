@@ -42,8 +42,7 @@ runTests : Nat -> Nat -> List Test -> List TestResult
   | attemptNum startSeed ts :=
     let
       numTests : Nat := length ts;
-      testSeeds : List Nat;
-      testSeeds :=
+      testSeeds : List Nat :=
         map (n in rangeStep attemptNum numTests)
           startSeed + n;
     in zipWith (runTest attemptNum) testSeeds ts;
@@ -51,8 +50,8 @@ runTests : Nat -> Nat -> List Test -> List TestResult
 runTestsIO : Nat -> Nat -> List Test -> IO
   | attemptNum startSeed ts :=
     let
-      results :
-        List TestResult := runTests attemptNum startSeed ts;
+      results : List TestResult :=
+        runTests attemptNum startSeed ts;
     in printStringLn (lines (map showTestResult results))
       >> if
         (allTestSuccess results)

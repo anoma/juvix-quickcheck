@@ -17,13 +17,14 @@ quickcheck
     -> Result
   | attemptNum startSeed t predicate :=
     let
-      seeds : List Nat;
-      seeds := map (n in range attemptNum) startSeed + n;
-      runOne : Property -> Nat -> Result;
-      runOne prop seed :=
-        let
-          result : Result := runProp prop (mkStdGen seed);
-        in overFailure result \ {(failure _ cs) := failure seed cs};
-      runAll : Property -> Result;
-      runAll prop := foldMap monoidResult (runOne prop) seeds;
+      seeds : List Nat :=
+        map (n in range attemptNum)
+          startSeed + n;
+      runOne : Property -> Nat -> Result
+        | prop seed :=
+          let
+            result : Result := runProp prop (mkStdGen seed);
+          in overFailure result \ {(failure _ cs) := failure seed cs};
+      runAll : Property -> Result
+        | prop := foldMap monoidResult (runOne prop) seeds;
     in runAll (toProp t predicate);
