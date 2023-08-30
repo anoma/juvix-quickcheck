@@ -8,22 +8,22 @@ import Test.QuickCheck.Property open public;
 import Test.QuickCheck.Result open public;
 import Test.QuickCheck.Testable open public;
 
-quickcheck :
-  {Predicate : Type}
+quickcheck
+  : {Predicate : Type}
     -> Nat
     -> Nat
     -> Testable Predicate
     -> Predicate
-    -> Result;
-quickcheck attemptNum startSeed t predicate :=
-  let
-    seeds : List Nat;
-    seeds := map (n in range attemptNum) startSeed + n;
-    runOne : Property -> Nat -> Result;
-    runOne prop seed :=
-      let
-        result : Result := runProp prop (mkStdGen seed);
-      in overFailure result \ {(failure _ cs) := failure seed cs};
-    runAll : Property -> Result;
-    runAll prop := foldMap monoidResult (runOne prop) seeds;
-  in runAll (toProp t predicate);
+    -> Result
+  | attemptNum startSeed t predicate :=
+    let
+      seeds : List Nat;
+      seeds := map (n in range attemptNum) startSeed + n;
+      runOne : Property -> Nat -> Result;
+      runOne prop seed :=
+        let
+          result : Result := runProp prop (mkStdGen seed);
+        in overFailure result \ {(failure _ cs) := failure seed cs};
+      runAll : Property -> Result;
+      runAll prop := foldMap monoidResult (runOne prop) seeds;
+    in runAll (toProp t predicate);

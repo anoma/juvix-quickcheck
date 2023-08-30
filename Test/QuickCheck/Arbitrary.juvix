@@ -9,15 +9,13 @@ import Test.QuickCheck.CoArbitrary open;
 type Arbitrary (A : Type) :=
   | arbitrary : Gen A -> Arbitrary A;
 
-runArb : {A : Type} -> Arbitrary A -> StdGen -> A;
-runArb (arbitrary g) rand := runGen g rand;
+runArb : {A : Type} -> Arbitrary A -> StdGen -> A
+  | (arbitrary g) rand := runGen g rand;
 
-arbitraryNat : Arbitrary Nat;
-arbitraryNat :=
+arbitraryNat : Arbitrary Nat :=
   arbitrary (gen \ {rand := fst (stdNext rand)});
 
-arbitraryInt : Arbitrary Int;
-arbitraryInt :=
+arbitraryInt : Arbitrary Int :=
   arbitrary
     (gen
       \ {rand :=
@@ -27,37 +25,36 @@ arbitraryInt :=
           isPos : Bool := fst (randBool (snd runRand));
         in if isPos (ofNat n) (negSuc n)});
 
-arbitraryBool : Arbitrary Bool;
-arbitraryBool :=
+arbitraryBool : Arbitrary Bool :=
   arbitrary (gen \ {rand := fst (randBool rand)});
 
-arbitraryFunction :
-  {A : Type}
+arbitraryFunction
+  : {A : Type}
     -> {B : Type}
     -> CoArbitrary A B
     -> Arbitrary B
-    -> Arbitrary (A -> B);
-arbitraryFunction (coarbitrary f) (arbitrary g) :=
-  arbitrary (promote (f g));
+    -> Arbitrary (A -> B)
+  | (coarbitrary f) (arbitrary g) :=
+    arbitrary (promote (f g));
 
-arbitraryList :
-  {A : Type} -> Arbitrary A -> Arbitrary (List A);
-arbitraryList {A} (arbitrary g) :=
-  arbitrary
-    (gen
-      \ {rand :=
-        let
-          randSplit : StdGen × StdGen := stdSplit rand;
-          rand1 : StdGen := fst randSplit;
-          rand2 : StdGen := snd randSplit;
-          len : Nat := fst (randNat rand1 0 10);
-          randList : StdGen -> Nat -> List A;
-          randList _ zero := nil;
-          randList r (suc n) :=
-            let
-              rSplit : StdGen × StdGen;
-              rSplit := stdSplit r;
-              r1 : StdGen := fst rSplit;
-              r2 : StdGen := snd rSplit;
-            in runGen g r1 :: randList r2 n;
-        in randList rand2 len});
+arbitraryList
+  : {A : Type} -> Arbitrary A -> Arbitrary (List A)
+  | {A} (arbitrary g) :=
+    arbitrary
+      (gen
+        \ {rand :=
+          let
+            randSplit : StdGen × StdGen := stdSplit rand;
+            rand1 : StdGen := fst randSplit;
+            rand2 : StdGen := snd randSplit;
+            len : Nat := fst (randNat rand1 0 10);
+            randList : StdGen -> Nat -> List A;
+            randList _ zero := nil;
+            randList r (suc n) :=
+              let
+                rSplit : StdGen × StdGen;
+                rSplit := stdSplit r;
+                r1 : StdGen := fst rSplit;
+                r2 : StdGen := snd rSplit;
+              in runGen g r1 :: randList r2 n;
+          in randList rand2 len});

@@ -13,46 +13,42 @@ import Stdlib.Data.Nat.Ord as Nat;
 type CoArbitrary (A : Type) (B : Type) :=
   | coarbitrary : (Gen B -> A -> Gen B) -> CoArbitrary A B;
 
-binaryDigits : Nat -> List Nat;
-binaryDigits n :=
-  let
-    terminating
-    go : Nat -> List Nat;
-    go n :=
-      if (n Nat.== 0) nil (Nat.mod n 2 :: go (Nat.div n 2));
-  in reverse (go n);
+binaryDigits : Nat -> List Nat
+  | n :=
+    let
+      terminating
+      go : Nat -> List Nat;
+      go n :=
+        if (n Nat.== 0) nil (Nat.mod n 2 :: go (Nat.div n 2));
+    in reverse (go n);
 
-perturb : Int -> StdGen -> StdGen;
-perturb n rand0 :=
-  let
-    vary : Bool -> StdGen -> StdGen;
-    vary b g :=
-      let
-        splitG : StdGen × StdGen := stdSplit g;
-      in if b (snd splitG) (fst splitG);
-    terminating
-    digitsParity : List Bool;
-    digitsParity := map (x in binaryDigits (abs n)) x Nat.== 0;
-  in for (rand := vary (n < 0) rand0) (b in digitsParity)
-       vary b rand;
+perturb : Int -> StdGen -> StdGen
+  | n rand0 :=
+    let
+      vary : Bool -> StdGen -> StdGen;
+      vary b g :=
+        let
+          splitG : StdGen × StdGen := stdSplit g;
+        in if b (snd splitG) (fst splitG);
+      terminating
+      digitsParity : List Bool;
+      digitsParity := map (x in binaryDigits (abs n)) x Nat.== 0;
+    in for (rand := vary (n < 0) rand0) (b in digitsParity)
+         vary b rand;
 
-coarbitraryIntInt : CoArbitrary Int Int;
-coarbitraryIntInt :=
+coarbitraryIntInt : CoArbitrary Int Int :=
   coarbitrary
     \ {g n := gen \ {rand := runGen g (perturb n rand)}};
 
-coarbitraryIntIntHof : CoArbitrary Int (Int -> Int);
-coarbitraryIntIntHof :=
+coarbitraryIntIntHof : CoArbitrary Int (Int -> Int) :=
   coarbitrary
     \ {g n := gen \ {rand := runGen g (perturb n rand)}};
 
-coarbitraryIntBool : CoArbitrary Int Bool;
-coarbitraryIntBool :=
+coarbitraryIntBool : CoArbitrary Int Bool :=
   coarbitrary
     \ {g n := gen \ {rand := runGen g (perturb n rand)}};
 
-coarbitraryListInt : CoArbitrary (List Int) Int;
-coarbitraryListInt :=
+coarbitraryListInt : CoArbitrary (List Int) Int :=
   coarbitrary
     \ {g xs :=
       gen

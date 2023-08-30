@@ -4,32 +4,29 @@ import Stdlib.Prelude open;
 
 import Stdlib.Data.Int.Ord as Int;
 
-rangeStep : Nat -> Nat -> List Nat;
-rangeStep step n :=
-  let
-    go : Nat -> List Nat -> List Nat;
-    go zero xs := xs;
-    go (suc n) xs := go n (n * step :: xs);
-  in go n nil;
+rangeStep : Nat -> Nat -> List Nat
+  | step n :=
+    let
+      go : Nat -> List Nat -> List Nat;
+      go zero xs := xs;
+      go (suc n) xs := go n (n * step :: xs);
+    in go n nil;
 
-unzipWith :
-  {A : Type}
+unzipWith
+  : {A : Type}
     -> {B : Type}
     -> {C : Type}
     -> (A -> B -> C)
     -> List (A × B)
-    -> List C;
-unzipWith := map ∘ uncurry;
+    -> List C := map ∘ uncurry;
 
-range : Nat -> List Nat;
-range n := rangeStep 1 n;
+range : Nat -> List Nat
+  | n := rangeStep 1 n;
 
-sortInt : List Int -> List Int;
-sortInt := quickSort IntTraits.Ord;
+sortInt : List Int -> List Int := quickSort IntTraits.Ord;
 
-eqListInt : List Int -> List Int -> Bool;
-eqListInt nil nil := true;
-eqListInt (x :: _) nil := false;
-eqListInt nil (x :: _) := false;
-eqListInt (x :: xs) (y :: ys) :=
-  x Int.== y && eqListInt xs ys;
+eqListInt : List Int -> List Int -> Bool
+  | nil nil := true
+  | (x :: _) nil := false
+  | nil (x :: _) := false
+  | (x :: xs) (y :: ys) := x Int.== y && eqListInt xs ys;

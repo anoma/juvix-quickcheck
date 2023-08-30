@@ -9,5 +9,5 @@ import Test.QuickCheck.Result open;
 type Property :=
   | property : Gen Result -> Property;
 
-runProp : Property -> StdGen -> Result;
-runProp (property g) rand := runGen g rand;
+runProp : Property -> StdGen -> Result
+  | (property g) rand := runGen g rand;

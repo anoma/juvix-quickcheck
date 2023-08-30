@@ -4,9 +4,8 @@ import Stdlib.Prelude open;
 
 import Data.Monoid as Monoid;
 
-intercalate : String → List String → String;
-intercalate sep xs :=
-  Monoid.mconcat Monoid.string (intersperse sep xs);
+intercalate : String → List String → String
+  | sep xs :=
+    Monoid.mconcat Monoid.string (intersperse sep xs);
 
-lines : List String -> String;
-lines := intercalate "\n";
+lines : List String -> String := intercalate "\n";

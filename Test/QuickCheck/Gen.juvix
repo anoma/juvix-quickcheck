@@ -6,9 +6,9 @@ import Data.Random open;
 type Gen (A : Type) :=
   | gen : (StdGen -> A) -> Gen A;
 
-runGen : {A : Type} -> Gen A -> StdGen -> A;
-runGen (gen f) := f;
+runGen : {A : Type} -> Gen A -> StdGen -> A
+  | (gen f) := f;
 
-promote :
-  {A : Type} -> {B : Type} -> (A -> Gen B) -> Gen (A -> B);
-promote f := gen \ {rand a := runGen (f a) rand};
+promote
+  : {A : Type} -> {B : Type} -> (A -> Gen B) -> Gen (A -> B)
+  | f := gen \ {rand a := runGen (f a) rand};

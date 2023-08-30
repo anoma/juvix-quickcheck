@@ -11,49 +11,50 @@ import Stdlib.Debug.Fail as Fail;
 type Test :=
   | test : String -> Property -> Test;
 
-mkTest :
-  {Predicate : Type}
+mkTest
+  : {Predicate : Type}
     -> Testable Predicate
     -> String
     -> Predicate
-    -> Test;
-mkTest t name p := test name (toProp t p);
+    -> Test
+  | t name p := test name (toProp t p);
 
 type TestResult :=
   | testResult : String -> Result -> TestResult;
 
-result : TestResult -> Result;
-result (testResult _ r) := r;
+result : TestResult -> Result
+  | (testResult _ r) := r;
 
-allTestSuccess : List TestResult -> Bool;
-allTestSuccess ts := allSuccess (map result ts);
+allTestSuccess : List TestResult -> Bool
+  | ts := allSuccess (map result ts);
 
-showTestResult : TestResult -> String;
-showTestResult (testResult name res) :=
-  "'" ++str name ++str "': " ++str showResult res;
+showTestResult : TestResult -> String
+  | (testResult name res) :=
+    "'" ++str name ++str "': " ++str showResult res;
 
-runTest : Nat -> Nat -> Test -> TestResult;
-runTest attemptNum seed (test name p) :=
-  testResult
-    name
-    (quickcheck attemptNum seed testableProperty p);
+runTest : Nat -> Nat -> Test -> TestResult
+  | attemptNum seed (test name p) :=
+    testResult
+      name
+      (quickcheck attemptNum seed testableProperty p);
 
-runTests : Nat -> Nat -> List Test -> List TestResult;
-runTests attemptNum startSeed ts :=
-  let
-    numTests : Nat := length ts;
-    testSeeds : List Nat;
-    testSeeds :=
-      map (n in rangeStep attemptNum numTests) startSeed + n;
-  in zipWith (runTest attemptNum) testSeeds ts;
+runTests : Nat -> Nat -> List Test -> List TestResult
+  | attemptNum startSeed ts :=
+    let
+      numTests : Nat := length ts;
+      testSeeds : List Nat;
+      testSeeds :=
+        map (n in rangeStep attemptNum numTests)
+          startSeed + n;
+    in zipWith (runTest attemptNum) testSeeds ts;
 
-runTestsIO : Nat -> Nat -> List Test -> IO;
-runTestsIO attemptNum startSeed ts :=
-  let
-    results :
-      List TestResult := runTests attemptNum startSeed ts;
-  in printStringLn (lines (map showTestResult results))
-    >> if
-      (allTestSuccess results)
-      (printStringLn "All tests passed")
-      (Fail.fail "Test failed");
+runTestsIO : Nat -> Nat -> List Test -> IO
+  | attemptNum startSeed ts :=
+    let
+      results :
+        List TestResult := runTests attemptNum startSeed ts;
+    in printStringLn (lines (map showTestResult results))
+      >> if
+        (allTestSuccess results)
+        (printStringLn "All tests passed")
+        (Fail.fail "Test failed");
