@@ -23,7 +23,7 @@ unzipWith
 range : Nat -> List Nat
   | n := rangeStep 1 n;
 
-sortInt : List Int -> List Int := quickSort IntTraits.Ord;
+sortInt : List Int -> List Int := quickSort ordIntI;
 
 eqListInt : List Int -> List Int -> Bool
   | nil nil := true

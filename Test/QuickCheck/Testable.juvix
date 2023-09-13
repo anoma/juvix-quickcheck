@@ -62,14 +62,14 @@ testableFunction
     testable \ {f := forAll s t g f};
 
 argumentInt : Argument Int :=
-  argument IntTraits.Show arbitraryInt;
+  argument showIntI arbitraryInt;
 
 argumentNat : Argument Nat :=
-  argument NatTraits.Show arbitraryNat;
+  argument showNatI arbitraryNat;
 
 argumentList : {A : Type} -> Argument A -> Argument (List A)
   | (argument s a) :=
-    argument (ListTraits.Show s) (arbitraryList a);
+    argument (showListI {{s}}) (arbitraryList a);
 
 showableFunction : {A B : Type} -> Show (A -> B) :=
   mkShow (const "function");

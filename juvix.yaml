@@ -1,4 +1,8 @@
 name: quickcheck
-version: 0.6.2
+version: 0.7.0
+main: Example.juvix
 dependencies:
-  - deps/stdlib
+  - git:
+      url: https://github.com/anoma/juvix-stdlib
+      name: stdlib
+      ref: 8d3941afdae706fe1c9960e7b68be799df515c32

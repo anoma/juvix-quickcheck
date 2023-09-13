@@ -1,18 +1,10 @@
 
 all: run-quickcheck
 
-deps/stdlib:
-	@mkdir -p deps/
-	@git clone https://github.com/anoma/juvix-stdlib.git deps/stdlib
-	@git -C deps/stdlib checkout b7edcc335feee4e3db87b5aca46381e2d9644ab0
-
-.PHONY: deps
-deps: deps/stdlib
-
-build/Random: Data/Random.juvix deps
+build/Random: Data/Random.juvix
 	juvix compile Data/Random.juvix -o build/Random
 
-build/Example: $(wildcard ./**/*.juvix) Example.juvix deps
+build/Example: $(wildcard ./**/*.juvix) Example.juvix
 	@mkdir -p build
 	juvix compile Example.juvix -o build/Example
 
@@ -30,7 +22,7 @@ clean-build:
 
 .PHONY: clean-deps
 clean-deps:
-	@rm -rf deps/
+	juvix clean
 
 .PHONY: clean
 clean: clean-deps clean-build
