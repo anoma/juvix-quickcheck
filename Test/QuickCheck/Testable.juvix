@@ -9,21 +9,22 @@ import Test.QuickCheck.Property open;
 import Test.QuickCheck.Gen open;
 
 --- A conversion from a Type A to a ;Property;
+trait
 type Testable (A : Type) :=
-  | testable : (A -> Property) -> Testable A;
+  mkTestable { testable : A -> Property };
 
 toProp : {A : Type} -> Testable A -> A -> Property
-  | (testable f) := f;
+  | (mkTestable f) := f;
 
 forAll
   : {A : Type}
     -> {T : Type}
-    -> Show A
-    -> Testable T
+    -> {{Show A}}
+    -> {{Testable T}}
     -> Gen A
     -> (A -> T)
     -> Property
-  | {A} {T} (mkShow to-str) (testable asProp) g prop :=
+  | {A} {T} g prop :=
     property
       (gen
         \ {rand :=
@@ -32,22 +33,22 @@ forAll
             rand1 : StdGen := fst srand;
             rand2 : StdGen := snd srand;
             arg : A := runGen g rand1;
-            subProp : Property := asProp (prop arg);
+            subProp : Property := Testable.testable (prop arg);
             res : Result := runProp subProp rand2;
           in overFailure
             res
-            \ {(failure s cs) := failure s (to-str arg :: cs)}});
+            \ {(failure s cs) := failure s (Show.show arg :: cs)}});
 
-testableProperty : Testable Property := testable id;
+testableProperty : Testable Property := mkTestable id;
 
 testableResult : Testable Result :=
-  testable \ {r := property (gen (const r))};
+  mkTestable \ {r := property (gen (const r))};
 
 testableBool : Testable Bool :=
   let
     toResult : Bool -> Result
       | b := if b success (fail (failure 0 nil));
-  in testable \ {b := toProp testableResult (toResult b)};
+  in mkTestable \ {b := toProp testableResult (toResult b)};
 
 type Argument (A : Type) :=
   | argument : Show A -> Arbitrary A -> Argument A;
@@ -59,7 +60,7 @@ testableFunction
     -> Testable T
     -> Testable (A -> T)
   | (argument s (arbitrary g)) t :=
-    testable \ {f := forAll s t g f};
+    mkTestable \ {f := forAll {{s}} {{t}} g f};
 
 argumentInt : Argument Int :=
   argument showIntI arbitraryInt;
