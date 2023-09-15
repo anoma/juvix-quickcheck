@@ -3,12 +3,7 @@ module Test.QuickCheck.Gen;
 import Data.Random open;
 
 --- A generator of values of type A
-type Gen (A : Type) :=
-  | gen : (StdGen -> A) -> Gen A;
+type Gen (A : Type) := mkGen {run : StdGen -> A};
 
-runGen : {A : Type} -> Gen A -> StdGen -> A
-  | (gen f) := f;
-
-promote
-  : {A : Type} -> {B : Type} -> (A -> Gen B) -> Gen (A -> B)
-  | f := gen \ {rand a := runGen (f a) rand};
+promote {A B} (f : A -> Gen B) : Gen (A -> B) :=
+  mkGen \ {rand a := Gen.run (f a) rand};

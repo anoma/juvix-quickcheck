@@ -4,8 +4,7 @@ import Stdlib.Prelude open;
 import Data.Monoid open;
 import Data.String open;
 
-type Failure :=
-  | failure : Nat -> List String -> Failure;
+type Failure := failure : Nat -> List String -> Failure;
 
 type Result :=
   | success : Result

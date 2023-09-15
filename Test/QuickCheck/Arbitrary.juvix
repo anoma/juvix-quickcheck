@@ -6,18 +6,20 @@ import Test.QuickCheck.Gen open;
 import Test.QuickCheck.CoArbitrary open;
 
 -- | A generator associated with a type A
-type Arbitrary (A : Type) :=
-  | arbitrary : Gen A -> Arbitrary A;
+trait
+type Arbitrary (A : Type) := mkArbitrary {gen : Gen A};
 
-runArb : {A : Type} -> Arbitrary A -> StdGen -> A
-  | (arbitrary g) rand := runGen g rand;
+runArb {A} {{Arbitrary A}} (rand : StdGen) : A :=
+  Gen.run Arbitrary.gen rand;
 
+instance
 arbitraryNat : Arbitrary Nat :=
-  arbitrary (gen \ {rand := fst (stdNext rand)});
+  mkArbitrary (mkGen \ {rand := fst (stdNext rand)});
 
+instance
 arbitraryInt : Arbitrary Int :=
-  arbitrary
-    (gen
+  mkArbitrary
+    (mkGen
       \ {rand :=
         let
           runRand : Nat × StdGen := stdNext rand;
@@ -25,35 +27,31 @@ arbitraryInt : Arbitrary Int :=
           isPos : Bool := fst (randBool (snd runRand));
         in if isPos (ofNat n) (negSuc n)});
 
+instance
 arbitraryBool : Arbitrary Bool :=
-  arbitrary (gen \ {rand := fst (randBool rand)});
+  mkArbitrary (mkGen \ {rand := fst (randBool rand)});
 
-arbitraryFunction
-  : {A : Type}
-    -> {B : Type}
-    -> CoArbitrary A B
-    -> Arbitrary B
-    -> Arbitrary (A -> B)
-  | (coarbitrary f) (arbitrary g) :=
-    arbitrary (promote (f g));
+arbitraryFunction {A B} {{CoArbitrary A B}} {{Arbitrary B}}
+  : Arbitrary (A -> B) :=
+  mkArbitrary
+    (promote (CoArbitrary.coarbitrary Arbitrary.gen));
 
-arbitraryList
-  : {A : Type} -> Arbitrary A -> Arbitrary (List A)
-  | {A} (arbitrary g) :=
-    arbitrary
-      (gen
-        \ {rand :=
-          let
-            randSplit : StdGen × StdGen := stdSplit rand;
-            rand1 : StdGen := fst randSplit;
-            rand2 : StdGen := snd randSplit;
-            len : Nat := fst (randNat rand1 0 10);
-            randList : StdGen -> Nat -> List A
-              | _ zero := nil
-              | r (suc n) :=
-                let
-                  rSplit : StdGen × StdGen := stdSplit r;
-                  r1 : StdGen := fst rSplit;
-                  r2 : StdGen := snd rSplit;
-                in runGen g r1 :: randList r2 n;
-          in randList rand2 len});
+instance
+arbitraryList {A} {{Arbitrary A}} : Arbitrary (List A) :=
+  mkArbitrary
+    (mkGen
+      \ {rand :=
+        let
+          randSplit : StdGen × StdGen := stdSplit rand;
+          rand1 : StdGen := fst randSplit;
+          rand2 : StdGen := snd randSplit;
+          len : Nat := fst (randNat rand1 0 10);
+          randList : StdGen -> Nat -> List A
+            | _ zero := nil
+            | r (suc n) :=
+              let
+                rSplit : StdGen × StdGen := stdSplit r;
+                r1 : StdGen := fst rSplit;
+                r2 : StdGen := snd rSplit;
+              in Gen.run Arbitrary.gen r1 :: randList r2 n;
+        in randList rand2 len});

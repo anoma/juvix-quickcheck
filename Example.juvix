@@ -26,8 +26,8 @@ prop-tailLengthOneLess : List Int -> Bool
 
 prop-splitAtRecombine : Nat -> List Int -> Bool
   | n xs :=
-    case splitAt n xs
-      | lhs, rhs := eqListInt xs (lhs ++ rhs);
+    case splitAt n xs of {lhs, rhs :=
+      eqListInt xs (lhs ++ rhs)};
 
 prop-mergeSumLengths : List Int -> List Int -> Bool
   | xs ys :=
@@ -36,11 +36,10 @@ prop-mergeSumLengths : List Int -> List Int -> Bool
 
 prop-partition : List Int -> (Int -> Bool) -> Bool
   | xs p :=
-    case partition p xs
-      | lhs, rhs :=
-        all p lhs
-          && not (any p rhs)
-          && eqListInt (sortInt xs) (sortInt (lhs ++ rhs));
+    case partition p xs of {lhs, rhs :=
+      all p lhs
+        && not (any p rhs)
+        && eqListInt (sortInt xs) (sortInt (lhs ++ rhs))};
 
 prop-distributive : Int -> Int -> (Int -> Int) -> Bool
   | a b f := f (a + b) == f a + f b;
@@ -56,49 +55,49 @@ prop-gcd-bad : Int -> Int -> Bool
 
 gcdNoCoprimeTest : QC.Test :=
   QC.mkTest
-    QC.testableBinaryInt
+    {{QC.testableFunction2}}
     "no integers are coprime"
     prop-gcd-bad;
 
 partitionTest : QC.Test :=
   QC.mkTest
-    QC.testableListIntHofIntBool
+    {{QC.testableHof1}}
     "partition: recombination of the output equals the input"
     prop-partition;
 
 testDistributive : QC.Test :=
   QC.mkTest
-    QC.testableIntIntHofIntInt
+    {{QC.testableHof2}}
     "all functions are distributive over +"
     prop-distributive;
 
 reverseLengthTest : QC.Test :=
   QC.mkTest
-    QC.testableListInt
+    {{QC.testableFunction}}
     "reverse preserves length"
     prop-reverseDoesNotChangeLength;
 
 reverseReverseIdTest : QC.Test :=
   QC.mkTest
-    QC.testableListInt
+    {{QC.testableFunction}}
     "reverse of reverse is identity"
     prop-reverseReverseIsIdentity;
 
 splitAtRecombineTest : QC.Test :=
   QC.mkTest
-    QC.testableNatListInt
+    {{QC.testableFunction2}}
     "splitAt: recombination of the output is equal to the input list"
     prop-splitAtRecombine;
 
 mergeSumLengthsTest : QC.Test :=
   QC.mkTest
-    QC.testableListIntListInt
+    {{QC.testableFunction2}}
     "merge: sum of the lengths of input lists is equal to the length of output list"
     prop-mergeSumLengths;
 
 tailLengthOneLessTest : QC.Test :=
   QC.mkTest
-    QC.testableListInt
+    {{QC.testableFunction}}
     "tail: length of output is one less than input unless empty"
     prop-tailLengthOneLess;
 
@@ -108,10 +107,4 @@ main : IO :=
       QC.runTestsIO
         100
         (stringToNat seed)
-        (partitionTest
-          :: reverseLengthTest
-          :: reverseReverseIdTest
-          :: splitAtRecombineTest
-          :: mergeSumLengthsTest
-          :: tailLengthOneLessTest
-          :: nil)};
+        [partitionTest; reverseLengthTest; reverseReverseIdTest; splitAtRecombineTest; mergeSumLengthsTest; tailLengthOneLessTest]};

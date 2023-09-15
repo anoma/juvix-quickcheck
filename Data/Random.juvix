@@ -10,8 +10,7 @@ import Stdlib.Data.Int as Int open using {Int};
 
 import Stdlib.Data.Int.Ord as Int;
 
-type StdGen :=
-  | stdGen : Nat -> Nat -> Nat -> StdGen;
+type StdGen := stdGen : Nat -> Nat -> Nat -> StdGen;
 
 stdGenS1 : StdGen -> Nat
   | (stdGen s1 _ _) := s1;

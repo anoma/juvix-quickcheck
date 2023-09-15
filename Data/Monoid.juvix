@@ -3,7 +3,7 @@ module Data.Monoid;
 import Stdlib.Prelude open;
 
 type Monoid (A : Type) :=
-  | monoid : A -> (A -> A -> A) -> Monoid A;
+  monoid : A -> (A -> A -> A) -> Monoid A;
 
 foldMap
   : {A : Type}
