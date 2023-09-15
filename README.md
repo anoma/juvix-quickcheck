@@ -9,35 +9,27 @@ Here's an example module that defines and tests a property.
 ```
 module Example;
 
-open import Stdlib.Prelude;
-open import Stdlib.Data.Nat.Ord;
+import Stdlib.Prelude open;
+import Stdlib.Data.Nat.Ord open;
 
 import Test.QuickCheckTest as QC;
 
-prop-partition : List Int -> (Int -> Bool) -> Bool;
-prop-partition xs p :=
-  case partition p xs
-    | lhs, rhs :=
-      all p lhs
-        && not (any p rhs)
-        && length xs == length (lhs ++ rhs);
+prop-partition (xs : List Int) (p : Int -> Bool) : Bool :=
+  case partition p xs of {lhs, rhs :=
+    all p lhs
+      && not (any p rhs)
+      && length xs == length (lhs ++ rhs)};
 
-partitionTest : QC.Test;
-partitionTest :=
+partitionTest : QC.Test :=
   QC.mkTest
-    QC.testableListIntHofIntBool
+    {{QC.testableHof1}}
     "partition: test predicate on result"
     prop-partition;
 
-main : IO;
-main :=
+main : IO :=
   readLn
-    \ {
-      | seed := QC.runTestsIO
-        100
-        (stringToNat seed)
-        (partitionTest :: nil)
-    };
+    \ {| seed :=
+      QC.runTestsIO 100 (stringToNat seed) [partitionTest]};
 ```
 
 To run this you need to pass a random seed to the runner:
