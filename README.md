@@ -33,7 +33,7 @@ To run this you need to pass a random seed to the runner:
 ``` shell
 $ juvix compile Example.juvix
 $ od -An -N2 -t u2 /dev/urandom | xargs | ./Example
-'partition: test predicate on result': success
+'reverse of reverse is identity': success
 All tests passed
 ```
 
