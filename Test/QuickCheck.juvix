@@ -7,23 +7,19 @@ import Data.Random open;
 import Test.QuickCheck.Property open public;
 import Test.QuickCheck.Result open public;
 import Test.QuickCheck.Testable open public;
+import Test.QuickCheck.Fun open public;
 
-quickcheck :
-  {Predicate : Type}
-    -> Nat
-    -> Nat
-    -> Testable Predicate
-    -> Predicate
-    -> Result;
-quickcheck attemptNum startSeed t predicate :=
-  let
-    seeds : List Nat;
-    seeds := map (n in range attemptNum) startSeed + n;
-    runOne : Property -> Nat -> Result;
-    runOne prop seed :=
-      let
-        result : Result := runProp prop (mkStdGen seed);
-      in overFailure result \ {(failure _ cs) := failure seed cs};
-    runAll : Property -> Result;
-    runAll prop := foldMap monoidResult (runOne prop) seeds;
-  in runAll (toProp t predicate);
+quickcheck {Predicate : Type} {{Testable Predicate}}
+  : Nat -> Nat -> Predicate -> Result
+  | attemptNum startSeed predicate :=
+    let
+      seeds : List Nat :=
+        map (n in range attemptNum)
+          startSeed + n;
+      runOne (prop : Property) (seed : Nat) : Result :=
+        let
+          result : Result := runProp prop (mkStdGen seed);
+        in overFailure result \ {(failure _ cs) := failure seed cs};
+      runAll (prop : Property) : Result :=
+        foldMap monoidResult (runOne prop) seeds;
+    in runAll (Testable.toProp predicate);

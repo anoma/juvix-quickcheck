@@ -7,155 +7,51 @@ import Test.QuickCheck.CoArbitrary open;
 import Test.QuickCheck.Result open;
 import Test.QuickCheck.Property open;
 import Test.QuickCheck.Gen open;
+import Test.QuickCheck.Fun open;
 
 --- A conversion from a Type A to a ;Property;
+trait
 type Testable (A : Type) :=
-  | testable : (A -> Property) -> Testable A;
+  mkTestable {toProp : A -> Property};
 
-toProp : {A : Type} -> Testable A -> A -> Property;
-toProp (testable f) := f;
+forAll {A T : Type} {{Show A}} {{Testable T}}
+  : Gen A -> (A -> T) -> Property
+  | g prop :=
+    mkProperty
+      (mkGen
+        \ {rand :=
+          let
+            srand : StdGen × StdGen := stdSplit rand;
+            rand1 : StdGen := fst srand;
+            rand2 : StdGen := snd srand;
+            arg : A := Gen.run g rand1;
+            subProp : Property := Testable.toProp (prop arg);
+            res : Result := runProp subProp rand2;
+          in overFailure
+            res
+            \ {(failure s cs) := failure s (Show.show arg :: cs)}});
 
-forAll :
-  {A : Type}
-    -> {T : Type}
-    -> Show A
-    -> Testable T
-    -> Gen A
-    -> (A -> T)
-    -> Property;
-forAll {A} {T} (mkShow to-str) (testable asProp) g prop :=
-  property
-    (gen
-      \ {rand :=
-        let
-          srand : StdGen × StdGen := stdSplit rand;
-          rand1 : StdGen := fst srand;
-          rand2 : StdGen := snd srand;
-          arg : A := runGen g rand1;
-          subProp : Property := asProp (prop arg);
-          res : Result := runProp subProp rand2;
-        in overFailure
-          res
-          \ {(failure s cs) := failure s (to-str arg :: cs)}});
+instance
+testableProperty : Testable Property := mkTestable id;
 
-testableProperty : Testable Property;
-testableProperty := testable id;
+instance
+testableResult : Testable Result :=
+  mkTestable \ {r := mkProperty (mkGen (const r))};
 
-testableResult : Testable Result;
-testableResult :=
-  testable \ {r := property (gen (const r))};
-
-testableBool : Testable Bool;
-testableBool :=
+instance
+testableBool : Testable Bool :=
   let
-    toResult : Bool -> Result;
-    toResult b := if b success (fail (failure 0 nil));
-  in testable \ {b := toProp testableResult (toResult b)};
+    toResult : Bool -> Result
+      | b := if b success (fail (failure 0 nil));
+  in mkTestable \ {b := Testable.toProp (toResult b)};
 
-type Argument (A : Type) :=
-  | argument : Show A -> Arbitrary A -> Argument A;
+-- Instance uses Fun wrapper because Testable (A -> T) is not currently supported by the compiler.
+-- https://github.com/anoma/juvix/issues/2371
+instance
+testableFunction {A T} {{Show A}} {{Arbitrary A}} {{Testable
+  T}} : Testable (Fun A T) :=
+  mkTestable \ {f := forAll Arbitrary.gen (Fun.fun f)};
 
-testableFunction :
-  {A : Type}
-    -> {T : Type}
-    -> Argument A
-    -> Testable T
-    -> Testable (A -> T);
-testableFunction (argument s (arbitrary g)) t :=
-  testable \ {f := forAll s t g f};
-
-argumentInt : Argument Int;
-argumentInt := argument IntTraits.Show arbitraryInt;
-
-argumentNat : Argument Nat;
-argumentNat := argument NatTraits.Show arbitraryNat;
-
-argumentList :
-  {A : Type} -> Argument A -> Argument (List A);
-argumentList (argument s a) :=
-  argument (ListTraits.Show s) (arbitraryList a);
-
-showableFunction : {A B : Type} -> Show (A -> B);
-showableFunction := mkShow (const "function");
-
-argumentListInt : Argument (List Int);
-argumentListInt := argumentList argumentInt;
-
-argumentFunction :
-  {A : Type}
-    -> {B : Type}
-    -> CoArbitrary A B
-    -> Arbitrary B
-    -> Argument (A -> B);
-argumentFunction coArb arb :=
-  argument showableFunction (arbitraryFunction coArb arb);
-
-argumentIntInt : Argument (Int -> Int);
-argumentIntInt :=
-  argumentFunction coarbitraryIntInt arbitraryInt;
-
-argumentIntIntInt : Argument (Int -> Int -> Int);
-argumentIntIntInt :=
-  case argumentIntInt
-    | argument _ arbIntInt :=
-      argumentFunction coarbitraryIntIntHof arbIntInt;
-
-testableBinaryInt : Testable (Int -> Int -> Bool);
-testableBinaryInt :=
-  testableFunction
-    argumentInt
-    (testableFunction argumentInt testableBool);
-
-testableListInt : Testable (List Int -> Bool);
-testableListInt :=
-  testableFunction (argumentList argumentInt) testableBool;
-
-testableListIntListInt :
-  Testable (List Int -> List Int -> Bool);
-testableListIntListInt :=
-  testableFunction
-    (argumentList argumentInt)
-    testableListInt;
-
-testableNatListInt : Testable (Nat -> List Int -> Bool);
-testableNatListInt :=
-  testableFunction argumentNat testableListInt;
-
-testableHofIntBool : Testable ((Int -> Bool) -> Bool);
-testableHofIntBool :=
-  let
-    arg : Argument (Int -> Bool);
-    arg := argumentFunction coarbitraryIntBool arbitraryBool;
-  in testableFunction arg testableBool;
-
-testableListIntHofIntBool :
-  Testable (List Int -> (Int -> Bool) -> Bool);
-testableListIntHofIntBool :=
-  testableFunction
-    (argumentList (argumentInt))
-    testableHofIntBool;
-
-testableHofIntInt : Testable ((Int -> Int) -> Bool);
-testableHofIntInt :=
-  let
-    arg :
-      Argument (Int -> Int) :=
-        argumentFunction coarbitraryIntInt arbitraryInt;
-  in testableFunction arg testableBool;
-
-testableIntIntHofIntInt :
-  Testable (Int -> Int -> (Int -> Int) -> Bool);
-testableIntIntHofIntInt :=
-  testableFunction
-    argumentInt
-    (testableFunction argumentInt testableHofIntInt);
-
-testableHofIntIntListIntListInt :
-  Testable
-    ((Int -> Int -> Int) -> List Int -> List Int -> Bool);
-testableHofIntIntListIntListInt :=
-  testableFunction
-    argumentIntIntInt
-    (testableFunction
-      argumentListInt
-      (testableFunction argumentListInt testableBool));
+instance
+showableFunction {A B : Type} : Show (Fun A B) :=
+  mkShow (const "function");

@@ -4,29 +4,27 @@ import Stdlib.Prelude open;
 import Data.Monoid open;
 import Data.String open;
 
-type Failure :=
-  | failure : Nat -> List String -> Failure;
+type Failure := failure : Nat -> List String -> Failure;
 
 type Result :=
   | success : Result
   | fail : Failure -> Result;
 
-isSuccess : Result -> Bool;
-isSuccess success := true;
-isSuccess (fail _) := false;
+isSuccess : Result -> Bool
+  | success := true
+  | (fail _) := false;
 
-showResult : Result -> String;
-showResult success := "success";
-showResult (fail (failure seed cs)) :=
-  "failure "
-    ++str "(seed : "
-    ++str natToString seed
-    ++str " , counterExamples: "
-    ++str ("[" ++str intercalate ", " cs ++str "]")
-    ++str ")";
+showResult : Result -> String
+  | success := "success"
+  | (fail (failure seed cs)) :=
+    "failure "
+      ++str "(seed : "
+      ++str natToString seed
+      ++str " , counterExamples: "
+      ++str ("[" ++str intercalate ", " cs ++str "]")
+      ++str ")";
 
-monoidResult : Monoid Result;
-monoidResult :=
+monoidResult : Monoid Result :=
   monoid
     success
     \ {
@@ -34,9 +32,9 @@ monoidResult :=
       | _ y := y
     };
 
-overFailure : Result -> (Failure -> Failure) -> Result;
-overFailure success _ := success;
-overFailure (fail x) f := fail (f x);
+overFailure : Result -> (Failure -> Failure) -> Result
+  | success _ := success
+  | (fail x) f := fail (f x);
 
-allSuccess : List Result -> Bool;
-allSuccess := isSuccess ∘ foldMap monoidResult id;
+allSuccess : List Result -> Bool :=
+  isSuccess ∘ foldMap monoidResult id;
