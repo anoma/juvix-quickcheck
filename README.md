@@ -12,24 +12,20 @@ module Example;
 import Stdlib.Prelude open;
 import Stdlib.Data.Nat.Ord open;
 
-import Test.QuickCheckTest as QC;
+import Test.QuickCheckTest as QC open using {Fun; mkFun};
 
-prop-partition (xs : List Int) (p : Int -> Bool) : Bool :=
-  case partition p xs of {lhs, rhs :=
-    all p lhs
-      && not (any p rhs)
-      && length xs == length (lhs ++ rhs)};
+prop-reverseReverseIsIdentity : Fun (List Int) Bool :=
+  mkFun \ {xs := Eq.eq xs (reverse (reverse xs))};
 
-partitionTest : QC.Test :=
+reverseTest : QC.Test :=
   QC.mkTest
-    {{QC.testableHof1}}
-    "partition: test predicate on result"
-    prop-partition;
+    "reverse of reverse is identity"
+    prop-reverseReverseIsIdentity;
 
 main : IO :=
   readLn
-    \ {| seed :=
-      QC.runTestsIO 100 (stringToNat seed) [partitionTest]};
+    \ {seed :=
+      QC.runTestsIO 100 (stringToNat seed) [reverseTest]};
 ```
 
 To run this you need to pass a random seed to the runner:

@@ -3,6 +3,7 @@ module Test.QuickCheck.Arbitrary;
 import Stdlib.Prelude open;
 import Data.Random open;
 import Test.QuickCheck.Gen open;
+import Test.QuickCheck.Fun open;
 import Test.QuickCheck.CoArbitrary open;
 
 -- | A generator associated with a type A
@@ -31,11 +32,6 @@ instance
 arbitraryBool : Arbitrary Bool :=
   mkArbitrary (mkGen \ {rand := fst (randBool rand)});
 
-arbitraryFunction {A B} {{CoArbitrary A B}} {{Arbitrary B}}
-  : Arbitrary (A -> B) :=
-  mkArbitrary
-    (promote (CoArbitrary.coarbitrary Arbitrary.gen));
-
 instance
 arbitraryList {A} {{Arbitrary A}} : Arbitrary (List A) :=
   mkArbitrary
@@ -55,3 +51,9 @@ arbitraryList {A} {{Arbitrary A}} : Arbitrary (List A) :=
                 r2 : StdGen := snd rSplit;
               in Gen.run Arbitrary.gen r1 :: randList r2 n;
         in randList rand2 len});
+
+instance
+arbitraryFunction {A B} {{CoArbitrary A B}} {{Arbitrary B}}
+  : Arbitrary (Fun A B) :=
+  mkArbitrary
+    (promoteFun (CoArbitrary.coarbitrary Arbitrary.gen));

@@ -1,0 +1,3 @@
+module Test.QuickCheck.Fun;
+
+type Fun A B := mkFun {fun : A -> B};

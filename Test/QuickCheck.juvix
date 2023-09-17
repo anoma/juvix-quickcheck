@@ -7,6 +7,7 @@ import Data.Random open;
 import Test.QuickCheck.Property open public;
 import Test.QuickCheck.Result open public;
 import Test.QuickCheck.Testable open public;
+import Test.QuickCheck.Fun open public;
 
 quickcheck {Predicate : Type} {{Testable Predicate}}
   : Nat -> Nat -> Predicate -> Result
