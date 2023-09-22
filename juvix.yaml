@@ -5,4 +5,4 @@ dependencies:
   - git:
       url: https://github.com/anoma/juvix-stdlib
       name: stdlib
-      ref: 4facf14d9b2d06b81ce1be1882aa9050f768cb45
+      ref: ad27db542e0b220e117dec22f11ed6de78892f72
