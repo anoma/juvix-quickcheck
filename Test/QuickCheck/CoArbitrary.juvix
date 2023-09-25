@@ -4,6 +4,7 @@ import Data.Random open;
 import Data.Int open;
 import Stdlib.Prelude open;
 import Test.QuickCheck.Gen open;
+import Test.QuickCheck.Fun open;
 import Stdlib.Data.Int.Ord open;
 
 import Stdlib.Data.Nat as Nat;
@@ -43,7 +44,8 @@ coarbitraryIntInt : CoArbitrary Int Int :=
   mkCoarbitrary
     \ {g n := mkGen \ {rand := Gen.run g (perturb n rand)}};
 
-coarbitraryIntIntHof : CoArbitrary Int (Int -> Int) :=
+instance
+coarbitraryIntIntHof : CoArbitrary Int (Fun Int Int) :=
   mkCoarbitrary
     \ {g n := mkGen \ {rand := Gen.run g (perturb n rand)}};
 
