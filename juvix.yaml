@@ -1,5 +1,5 @@
 name: quickcheck
-version: 0.7.0
+version: 0.7.1
 main: Example.juvix
 dependencies:
   - git:
