@@ -40,7 +40,7 @@ prop-mergeSumLengths
       mkFun
         \ {ys :=
           length xs Nat.+ length ys
-            Nat.== length (merge ordIntI xs ys)}};
+            Nat.== length (merge {{ordIntI}} xs ys)}};
 
 prop-partition : Fun (List Int) (Fun (Fun Int Bool) Bool) :=
   mkFun
