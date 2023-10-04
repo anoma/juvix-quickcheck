@@ -4,37 +4,44 @@ import Stdlib.Prelude open;
 import Data.Monoid open;
 import Data.String open;
 
-type Failure := failure : Nat -> List String -> Failure;
+type Failure :=
+  mkFailure {
+    seed : Nat;
+    counterExamples : List String
+  };
 
 type Result :=
-  | success : Result
-  | fail : Failure -> Result;
+  | success
+  | failure Failure;
 
 isSuccess : Result -> Bool
   | success := true
-  | (fail _) := false;
+  | (failure _) := false;
 
 showResult : Result -> String
   | success := "success"
-  | (fail (failure seed cs)) :=
+  | (failure mkFailure@{seed; counterExamples}) :=
     "failure "
       ++str "(seed : "
       ++str natToString seed
       ++str " , counterExamples: "
-      ++str ("[" ++str intercalate ", " cs ++str "]")
+      ++str ("[" ++str intercalate ", " counterExamples ++str "]")
       ++str ")";
+
+instance
+showResultI : Show Result := mkShow showResult;
 
 monoidResult : Monoid Result :=
   monoid
     success
     \ {
-      | x@(fail _) _ := x
+      | x@(failure _) _ := x
       | _ y := y
     };
 
 overFailure : Result -> (Failure -> Failure) -> Result
   | success _ := success
-  | (fail x) f := fail (f x);
+  | (failure x) f := failure (f x);
 
 allSuccess : List Result -> Bool :=
   isSuccess ∘ foldMap monoidResult id;

@@ -7,16 +7,15 @@ import Test.QuickCheck.CoArbitrary open;
 import Test.QuickCheck.Result open;
 import Test.QuickCheck.Property open;
 import Test.QuickCheck.Gen open;
-import Test.QuickCheck.Fun open;
 
 --- A conversion from a Type A to a ;Property;
 trait
 type Testable (A : Type) :=
   mkTestable {toProp : A -> Property};
 
-forAll {A T : Type} {{Show A}} {{Testable T}}
-  : Gen A -> (A -> T) -> Property
-  | g prop :=
+forAll {A T : Type} {{Show A}} {{Arbitrary A}} {{Testable
+  T}} : (A -> T) -> Property
+  | prop :=
     mkProperty
       (mkGen
         \ {rand :=
@@ -24,12 +23,14 @@ forAll {A T : Type} {{Show A}} {{Testable T}}
             srand : StdGen × StdGen := stdSplit rand;
             rand1 : StdGen := fst srand;
             rand2 : StdGen := snd srand;
-            arg : A := Gen.run g rand1;
+            arg : A := Gen.run Arbitrary.gen rand1;
             subProp : Property := Testable.toProp (prop arg);
             res : Result := runProp subProp rand2;
           in overFailure
             res
-            \ {(failure s cs) := failure s (Show.show arg :: cs)}});
+            \ {f :=
+              f@Failure{counterExamples := Show.show arg
+                :: counterExamples}}});
 
 instance
 testableProperty : Testable Property := mkTestable id;
@@ -42,16 +43,13 @@ instance
 testableBool : Testable Bool :=
   let
     toResult : Bool -> Result
-      | b := if b success (fail (failure 0 nil));
+      | b := if b success (failure (mkFailure 0 nil));
   in mkTestable \ {b := Testable.toProp (toResult b)};
 
--- Instance uses Fun wrapper because Testable (A -> T) is not currently supported by the compiler.
--- https://github.com/anoma/juvix/issues/2371
 instance
 testableFunction {A T} {{Show A}} {{Arbitrary A}} {{Testable
-  T}} : Testable (Fun A T) :=
-  mkTestable \ {f := forAll Arbitrary.gen (Fun.fun f)};
+  T}} : Testable (A -> T) := mkTestable \ {f := forAll f};
 
 instance
-showableFunction {A B : Type} : Show (Fun A B) :=
+showableFunction {A B : Type} : Show (A -> B) :=
   mkShow (const "function");

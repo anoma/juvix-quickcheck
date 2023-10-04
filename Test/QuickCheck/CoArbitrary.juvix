@@ -4,7 +4,6 @@ import Data.Random open;
 import Data.Int open;
 import Stdlib.Prelude open;
 import Test.QuickCheck.Gen open;
-import Test.QuickCheck.Fun open;
 import Stdlib.Data.Int.Ord open;
 
 import Stdlib.Data.Nat as Nat;
@@ -12,8 +11,11 @@ import Stdlib.Data.Nat.Ord as Nat;
 
 -- | A perturbation of a generator associated with a type B
 trait
-type CoArbitrary (A : Type) (B : Type) :=
-  mkCoarbitrary {coarbitrary : Gen B -> A -> Gen B};
+type CoArbitrary (A : Type) :=
+  mkCoarbitrary {coarbitrary : {B : Type}
+    -> Gen B
+    -> A
+    -> Gen B};
 
 binaryDigits : Nat -> List Nat
   | n :=
@@ -40,22 +42,12 @@ perturb : Int -> StdGen -> StdGen
          vary b rand;
 
 instance
-coarbitraryIntInt : CoArbitrary Int Int :=
+coarbitraryInt : CoArbitrary Int :=
   mkCoarbitrary
     \ {g n := mkGen \ {rand := Gen.run g (perturb n rand)}};
 
 instance
-coarbitraryIntIntHof : CoArbitrary Int (Fun Int Int) :=
-  mkCoarbitrary
-    \ {g n := mkGen \ {rand := Gen.run g (perturb n rand)}};
-
-instance
-coarbitraryIntBool : CoArbitrary Int Bool :=
-  mkCoarbitrary
-    \ {g n := mkGen \ {rand := Gen.run g (perturb n rand)}};
-
-instance
-coarbitraryListInt : CoArbitrary (List Int) Int :=
+coarbitraryListInt : CoArbitrary (List Int) :=
   mkCoarbitrary
     \ {g xs :=
       mkGen
