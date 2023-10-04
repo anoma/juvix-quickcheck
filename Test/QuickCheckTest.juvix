@@ -55,4 +55,4 @@ runTestsIO : Nat -> Nat -> List Test -> IO
       >> if
         (allTestSuccess results)
         (printStringLn "All tests passed")
-        (Fail.fail "Test failed");
+        (Fail.failwith "Test failed");

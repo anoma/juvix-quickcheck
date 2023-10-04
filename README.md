@@ -12,10 +12,10 @@ module Example;
 import Stdlib.Prelude open;
 import Stdlib.Data.Nat.Ord open;
 
-import Test.QuickCheckTest as QC open using {Fun; mkFun};
+import Test.QuickCheckTest as QC;
 
-prop-reverseReverseIsIdentity : Fun (List Int) Bool :=
-  mkFun \ {xs := Eq.eq xs (reverse (reverse xs))};
+prop-reverseReverseIsIdentity (xs : List Int) : Bool :=
+  Eq.eq xs (reverse (reverse xs));
 
 reverseTest : QC.Test :=
   QC.mkTest

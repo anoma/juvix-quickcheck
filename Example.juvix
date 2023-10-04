@@ -11,69 +11,44 @@ import Data.List open;
 import Data.String open;
 import Data.Int open;
 
-import Test.QuickCheckTest as QC open using {Fun; mkFun; module Fun};
+import Test.QuickCheckTest as QC;
 
-prop-reverseDoesNotChangeLength : Fun (List Int) Bool :=
-  mkFun \ {xs := length (reverse xs) Nat.== length xs};
+prop-reverseDoesNotChangeLength (xs : List Int) : Bool :=
+  length (reverse xs) Nat.== length xs;
 
-prop-reverseReverseIsIdentity : Fun (List Int) Bool :=
-  mkFun \ {xs := eqListInt xs (reverse (reverse xs))};
+prop-reverseReverseIsIdentity (xs : List Int) : Bool :=
+  eqListInt xs (reverse (reverse xs));
 
-prop-tailLengthOneLess : Fun (List Int) Bool :=
-  mkFun
-    \ {xs :=
-      null xs
-        || ofNat (length (tail xs)) == intSubNat (length xs) 1};
+prop-tailLengthOneLess (xs : List Int) : Bool :=
+  null xs
+    || ofNat (length (tail xs)) == intSubNat (length xs) 1;
 
-prop-splitAtRecombine : Fun Nat (Fun (List Int) Bool) :=
-  mkFun
-    \ {n :=
-      mkFun
-        \ {xs :=
-          case splitAt n xs of {lhs, rhs :=
-            eqListInt xs (lhs ++ rhs)}}};
+prop-splitAtRecombine (n : Nat) (xs : List Int) : Bool :=
+  case splitAt n xs of {
+    lhs, rhs := eqListInt xs (lhs ++ rhs)
+  };
 
-prop-mergeSumLengths
-  : Fun (List Int) (Fun (List Int) Bool) :=
-  mkFun
-    \ {xs :=
-      mkFun
-        \ {ys :=
-          length xs Nat.+ length ys
-            Nat.== length (merge {{ordIntI}} xs ys)}};
+prop-mergeSumLengths (xs : List Int) (ys : List Int)
+  : Bool :=
+  length xs Nat.+ length ys
+    Nat.== length (merge {{ordIntI}} xs ys);
 
-prop-partition : Fun (List Int) (Fun (Fun Int Bool) Bool) :=
-  mkFun
-    \ {xs :=
-      mkFun
-        \ {pFun :=
-          let
-            p : Int -> Bool := Fun.fun pFun;
-          in case partition p xs of {lhs, rhs :=
-            all p lhs
-              && not (any p rhs)
-              && eqListInt (sortInt xs) (sortInt (lhs ++ rhs))}}};
+prop-partition (xs : List Int) (p : Int -> Bool) : Bool :=
+  case partition p xs of {
+    lhs, rhs :=
+      all p lhs
+        && not (any p rhs)
+        && eqListInt (sortInt xs) (sortInt (lhs ++ rhs))
+  };
 
-prop-distributive
-  : Fun Int (Fun Int (Fun (Fun Int Int) Bool)) :=
-  mkFun
-    \ {a :=
-      mkFun
-        \ {b :=
-          mkFun
-            \ {fFun :=
-              let
-                f : Int -> Int := Fun.fun fFun;
-              in f (a + b) == f a + f b}}};
+prop-distributive (a : Int) (b : Int) (f : Int -> Int)
+  : Bool := f (a + b) == f a + f b;
 
-prop-add-sub : Fun Int (Fun Int Bool) :=
-  mkFun \ {a := mkFun \ {b := a == a + b - b}};
+prop-add-sub (a : Int) (b : Int) : Bool := a == a + b - b;
 
-prop-add-sub-bad : Fun Int (Fun Int Bool) :=
-  mkFun \ {a := mkFun \ {b := a == 2}};
+prop-add-sub-bad (a : Int) (b : Int) : Bool := a == 2;
 
-prop-gcd-bad : Fun Int (Fun Int Bool) :=
-  mkFun \ {a := mkFun \ {b := gcd a b > 1}};
+prop-gcd-bad (a : Int) (b : Int) : Bool := gcd a b > 1;
 
 gcdNoCoprimeTest : QC.Test :=
   QC.mkTest "no integers are coprime" prop-gcd-bad;
