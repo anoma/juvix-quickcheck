@@ -1,13 +1,11 @@
 module Data.Int;
 
-import Stdlib.Prelude open hiding {mod};
-import Stdlib.Data.Int.Ord open;
-import Stdlib.Data.Int open;
+import Stdlib.Prelude open;
 
 gcd : Int → Int → Int
   | a b :=
     let
       terminating
       gcd' : Int -> Int -> Int
-        | a b := if (a == 0) b (gcd' (mod b a) a);
+        | a b := if (a == ofNat 0) b (gcd' (mod b a) a);
     in if (a > b) (gcd' b a) (gcd' a b);

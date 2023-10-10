@@ -4,10 +4,6 @@ import Data.Random open;
 import Data.Int open;
 import Stdlib.Prelude open;
 import Test.QuickCheck.Gen open;
-import Stdlib.Data.Int.Ord open;
-
-import Stdlib.Data.Nat as Nat;
-import Stdlib.Data.Nat.Ord as Nat;
 
 -- | A perturbation of a generator associated with a type B
 trait
@@ -23,7 +19,7 @@ binaryDigits : Nat -> List Nat
       terminating
       go : Nat -> List Nat
         | n :=
-          if (n Nat.== 0) nil (Nat.mod n 2 :: go (Nat.div n 2));
+          if (n == 0) nil (mod n 2 :: go (div n 2));
     in reverse (go n);
 
 perturb : Int -> StdGen -> StdGen
@@ -37,8 +33,8 @@ perturb : Int -> StdGen -> StdGen
       terminating
       digitsParity : List Bool :=
         map (x in binaryDigits (abs n))
-          x Nat.== 0;
-    in for (rand := vary (n < 0) rand0) (b in digitsParity)
+          x == 0;
+    in for (rand := vary (n < ofNat 0) rand0) (b in digitsParity)
          vary b rand;
 
 instance
