@@ -1,10 +1,10 @@
 module Example;
 
 import Stdlib.Prelude open;
+import Stdlib.Extra.Gcd open;
 
 import Data.List open;
 import Data.String open;
-import Data.Int open;
 
 import Test.QuickCheckTest as QC;
 

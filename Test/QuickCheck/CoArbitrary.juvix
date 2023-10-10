@@ -1,7 +1,6 @@
 module Test.QuickCheck.CoArbitrary;
 
 import Data.Random open;
-import Data.Int open;
 import Stdlib.Prelude open;
 import Test.QuickCheck.Gen open;
 
