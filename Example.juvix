@@ -25,8 +25,7 @@ prop-splitAtRecombine (n : Nat) (xs : List Int) : Bool :=
 
 prop-mergeSumLengths (xs : List Int) (ys : List Int)
   : Bool :=
-  length xs + length ys
-    == length (merge {{ordIntI}} xs ys);
+  length xs + length ys == length (merge {{ordIntI}} xs ys);
 
 prop-partition (xs : List Int) (p : Int -> Bool) : Bool :=
   case partition p xs of {
@@ -43,7 +42,8 @@ prop-add-sub (a : Int) (b : Int) : Bool := a == a + b - b;
 
 prop-add-sub-bad (a : Int) (b : Int) : Bool := a == ofNat 2;
 
-prop-gcd-bad (a : Int) (b : Int) : Bool := gcd a b > ofNat 1;
+prop-gcd-bad (a : Int) (b : Int) : Bool :=
+  gcd a b > ofNat 1;
 
 gcdNoCoprimeTest : QC.Test :=
   QC.mkTest "no integers are coprime" prop-gcd-bad;
@@ -89,4 +89,10 @@ main : IO :=
       QC.runTestsIO
         100
         (stringToNat seed)
-        [partitionTest; reverseLengthTest; reverseReverseIdTest; splitAtRecombineTest; mergeSumLengthsTest; tailLengthOneLessTest]};
+        [ partitionTest
+        ; reverseLengthTest
+        ; reverseReverseIdTest
+        ; splitAtRecombineTest
+        ; mergeSumLengthsTest
+        ; tailLengthOneLessTest
+        ]};

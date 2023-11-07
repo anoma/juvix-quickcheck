@@ -17,8 +17,7 @@ binaryDigits : Nat -> List Nat
     let
       terminating
       go : Nat -> List Nat
-        | n :=
-          if (n == 0) nil (mod n 2 :: go (div n 2));
+        | n := if (n == 0) nil (mod n 2 :: go (div n 2));
     in reverse (go n);
 
 perturb : Int -> StdGen -> StdGen
@@ -33,7 +32,9 @@ perturb : Int -> StdGen -> StdGen
       digitsParity : List Bool :=
         map (x in binaryDigits (abs n))
           x == 0;
-    in for (rand := vary (n < ofNat 0) rand0) (b in digitsParity)
+    in for (rand := vary
+           (n < ofNat 0)
+           rand0) (b in digitsParity)
          vary b rand;
 
 instance
