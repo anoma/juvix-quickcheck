@@ -6,6 +6,6 @@ import PackageDescription.V1 open;
 package : Package :=
   defaultPackage
     {name := "quickcheck";
-     version := mkVersion 0 8 0;
+     version := mkVersion 0 9 0;
      dependencies := [github "anoma" "juvix-stdlib" "v0.0.1"];
      main := just "Example.juvix"};
