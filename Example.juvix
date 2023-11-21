@@ -1,20 +1,15 @@
 module Example;
 
-import Stdlib.Prelude open hiding {+};
+import Stdlib.Prelude open;
+import Stdlib.Extra.Gcd open;
 
-import Stdlib.Data.Nat.Ord as Nat;
-import Stdlib.Data.Nat as Nat;
-
-import Stdlib.Data.Int.Ord open;
-import Stdlib.Data.Int open;
 import Data.List open;
 import Data.String open;
-import Data.Int open;
 
 import Test.QuickCheckTest as QC;
 
 prop-reverseDoesNotChangeLength (xs : List Int) : Bool :=
-  length (reverse xs) Nat.== length xs;
+  length (reverse xs) == length xs;
 
 prop-reverseReverseIsIdentity (xs : List Int) : Bool :=
   eqListInt xs (reverse (reverse xs));
@@ -30,8 +25,7 @@ prop-splitAtRecombine (n : Nat) (xs : List Int) : Bool :=
 
 prop-mergeSumLengths (xs : List Int) (ys : List Int)
   : Bool :=
-  length xs Nat.+ length ys
-    Nat.== length (merge {{ordIntI}} xs ys);
+  length xs + length ys == length (merge {{ordIntI}} xs ys);
 
 prop-partition (xs : List Int) (p : Int -> Bool) : Bool :=
   case partition p xs of {
@@ -46,9 +40,10 @@ prop-distributive (a : Int) (b : Int) (f : Int -> Int)
 
 prop-add-sub (a : Int) (b : Int) : Bool := a == a + b - b;
 
-prop-add-sub-bad (a : Int) (b : Int) : Bool := a == 2;
+prop-add-sub-bad (a : Int) (b : Int) : Bool := a == ofNat 2;
 
-prop-gcd-bad (a : Int) (b : Int) : Bool := gcd a b > 1;
+prop-gcd-bad (a : Int) (b : Int) : Bool :=
+  gcd a b > ofNat 1;
 
 gcdNoCoprimeTest : QC.Test :=
   QC.mkTest "no integers are coprime" prop-gcd-bad;
@@ -94,4 +89,10 @@ main : IO :=
       QC.runTestsIO
         100
         (stringToNat seed)
-        [partitionTest; reverseLengthTest; reverseReverseIdTest; splitAtRecombineTest; mergeSumLengthsTest; tailLengthOneLessTest]};
+        [ partitionTest
+        ; reverseLengthTest
+        ; reverseReverseIdTest
+        ; splitAtRecombineTest
+        ; mergeSumLengthsTest
+        ; tailLengthOneLessTest
+        ]};

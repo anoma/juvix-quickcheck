@@ -1,8 +1,0 @@
-name: quickcheck
-version: 0.8.0
-main: Example.juvix
-dependencies:
-  - git:
-      url: https://github.com/anoma/juvix-stdlib
-      name: stdlib
-      ref: 86f9e82c34395f3e0447c58566bc92347603ebd3

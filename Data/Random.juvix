@@ -4,11 +4,6 @@
 module Data.Random;
 
 import Stdlib.Prelude open;
-import Stdlib.Data.Nat.Ord open;
-
-import Stdlib.Data.Int as Int open using {Int};
-
-import Stdlib.Data.Int.Ord as Int;
 
 type StdGen := stdGen : Nat -> Nat -> Nat -> StdGen;
 
@@ -45,22 +40,22 @@ stdNext : StdGen -> Nat × StdGen
       s1 : Int := ofNat s1Nat;
       s2 : Int := ofNat s2Nat;
       s3 : Int := ofNat s3Nat;
-      k : Int := Int.div s1 206;
+      k : Int := div s1 (ofNat 206);
       s1' : Int :=
-        157 Int.* (s1 Int.- k Int.* 206) Int.- k Int.* 21;
-      s1'' : Int := if (s1' Int.< 0) (s1' Int.+ 32363) s1';
-      k' : Int := Int.div s2 217;
+        ofNat 157 * (s1 - k * ofNat 206) - k * ofNat 21;
+      s1'' : Int := if (s1' < ofNat 0) (s1' + ofNat 32363) s1';
+      k' : Int := div s2 (ofNat 217);
       s2' : Int :=
-        146 Int.* (s2 Int.- k' Int.* 217) Int.- k' Int.* 45;
-      s2'' : Int := if (s2' Int.< 0) (s2' Int.+ 31727) s2';
-      k'' : Int := Int.div s3 222;
+        ofNat 146 * (s2 - k' * ofNat 217) - k' * ofNat 45;
+      s2'' : Int := if (s2' < ofNat 0) (s2' + ofNat 31727) s2';
+      k'' : Int := div s3 (ofNat 222);
       s3' : Int :=
-        142 Int.* (s3 Int.- k' Int.* 222) Int.- k' Int.* 133;
-      s3'' : Int := if (s2' Int.< 0) (s2' Int.+ 31657) s3';
-      z : Int := s1'' Int.- s2'';
-      z' : Int := if (z Int.> 706) (z Int.- 32362) z;
+        ofNat 142 * (s3 - k' * ofNat 222) - k' * ofNat 133;
+      s3'' : Int := if (s2' < ofNat 0) (s2' + ofNat 31657) s3';
+      z : Int := s1'' - s2'';
+      z' : Int := if (z > ofNat 706) (z - ofNat 32362) z;
       z'' : Int :=
-        if (z' Int.< 1) (z' Int.+ 32362) (Int.mod z (ofNat k1));
+        if (z' < ofNat 1) (z' + ofNat 32362) (mod z (ofNat k1));
     in toNat z'', stdGen (toNat s1'') (toNat s2'') (toNat s3'');
 
 stdSplit : StdGen -> StdGen × StdGen
