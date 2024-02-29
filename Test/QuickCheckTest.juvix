@@ -14,8 +14,11 @@ type Test :=
     property : Property
   };
 
-mkTest {Predicate : Type} {{Testable
-  Predicate}} (name : String) (predicate : Predicate)
+mkTest
+  {Predicate : Type}
+  {{Testable Predicate}}
+  (name : String)
+  (predicate : Predicate)
   : Test := test name (Testable.toProp predicate);
 
 type TestResult :=

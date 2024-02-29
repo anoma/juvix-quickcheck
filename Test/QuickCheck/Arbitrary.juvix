@@ -52,7 +52,10 @@ arbitraryList {A} {{Arbitrary A}} : Arbitrary (List A) :=
         in randList rand2 len});
 
 instance
-arbitraryFunction {A B} {{CoArbitrary A}} {{Arbitrary B}}
+arbitraryFunction
+  {A B}
+  {{CoArbitrary A}}
+  {{Arbitrary B}}
   : Arbitrary (A -> B) :=
   mkArbitrary
     (promote (CoArbitrary.coarbitrary Arbitrary.gen));
