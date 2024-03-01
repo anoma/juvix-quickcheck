@@ -1,15 +1,10 @@
 module Package;
 
-import Stdlib.Prelude open;
 import PackageDescription.V2 open;
 
 package : Package :=
   defaultPackage
     {name := "quickcheck";
-     version := mkVersion 0 9 0;
-     dependencies := [ github
-                       "anoma"
-                       "juvix-stdlib"
-                       "27f54ef11c3b21cea18c6b00c54b1d4f3b0cb9f8"
-                     ];
+     version := mkVersion 0 10 0;
+     dependencies := [github "anoma" "juvix-stdlib" "v0.2.0"];
      main := just "Example.juvix"};
