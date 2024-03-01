@@ -13,8 +13,12 @@ trait
 type Testable (A : Type) :=
   mkTestable {toProp : A -> Property};
 
-forAll {A T : Type} {{Show A}} {{Arbitrary A}} {{Testable
-  T}} : (A -> T) -> Property
+forAll
+  {A T : Type}
+  {{Show A}}
+  {{Arbitrary A}}
+  {{Testable T}}
+  : (A -> T) -> Property
   | prop :=
     mkProperty
       (mkGen
@@ -47,8 +51,12 @@ testableBool : Testable Bool :=
   in mkTestable \ {b := Testable.toProp (toResult b)};
 
 instance
-testableFunction {A T} {{Show A}} {{Arbitrary A}} {{Testable
-  T}} : Testable (A -> T) := mkTestable \ {f := forAll f};
+testableFunction
+  {A T}
+  {{Show A}}
+  {{Arbitrary A}}
+  {{Testable T}}
+  : Testable (A -> T) := mkTestable \ {f := forAll f};
 
 instance
 showableFunction {A B : Type} : Show (A -> B) :=
