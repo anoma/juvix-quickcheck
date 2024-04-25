@@ -3,11 +3,11 @@ JUVIX_CMD=juvix
 all: run-quickcheck
 
 build/Random: Data/Random.juvix
-	${JUVIX_CMD} compile Data/Random.juvix -o build/Random
+	${JUVIX_CMD} compile native Data/Random.juvix -o build/Random
 
 build/Example: $(wildcard ./**/*.juvix) Example.juvix
 	@mkdir -p build
-	${JUVIX_CMD} compile Example.juvix -o build/Example
+	${JUVIX_CMD} compile native Example.juvix -o build/Example
 
 .PHONY: run-random
 run-random: build/Random
