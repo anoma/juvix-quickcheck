@@ -17,7 +17,7 @@ unzipWith
     -> {B : Type}
     -> {C : Type}
     -> (A -> B -> C)
-    -> List (A × B)
+    -> List (Pair A B)
     -> List C := map ∘ uncurry;
 
 range : Nat -> List Nat

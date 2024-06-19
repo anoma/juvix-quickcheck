@@ -26,7 +26,7 @@ perturb : Int -> StdGen -> StdGen
       vary : Bool -> StdGen -> StdGen
         | b g :=
           let
-            splitG : StdGen × StdGen := stdSplit g;
+            splitG : Pair StdGen StdGen := stdSplit g;
           in if b (snd splitG) (fst splitG);
       terminating
       digitsParity : List Bool :=
