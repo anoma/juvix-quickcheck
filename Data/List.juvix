@@ -18,7 +18,7 @@ unzipWith
     -> {C : Type}
     -> (A -> B -> C)
     -> List (Pair A B)
-    -> List C := map ∘ uncurry;
+    -> List C := map << uncurry;
 
 range : Nat -> List Nat
   | n := rangeStep 1 n;

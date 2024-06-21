@@ -119,7 +119,7 @@ run : Nat -> StdGen -> IO
       next : Pair Nat StdGen := randNat g 0 100;
       b : Nat := fst next;
       g' : StdGen := snd next;
-    in printNatLn b >> run n g';
+    in printNatLn b >>> run n g';
 
 main : IO :=
   let

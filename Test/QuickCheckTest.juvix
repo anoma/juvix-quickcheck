@@ -55,7 +55,7 @@ runTestsIO : Nat -> Nat -> List Test -> IO
       results : List TestResult :=
         runTests attemptNum startSeed ts;
     in printStringLn (lines (map showTestResult results))
-      >> if
+      >>> if
         (allTestSuccess results)
         (printStringLn "All tests passed")
         (Fail.failwith "Test failed");
