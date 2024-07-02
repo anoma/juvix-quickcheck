@@ -24,7 +24,7 @@ forAll
       (mkGen
         \ {rand :=
           let
-            srand : StdGen × StdGen := stdSplit rand;
+            srand : Pair StdGen StdGen := stdSplit rand;
             rand1 : StdGen := fst srand;
             rand2 : StdGen := snd srand;
             arg : A := Gen.run Arbitrary.gen rand1;
@@ -47,7 +47,7 @@ instance
 testableBool : Testable Bool :=
   let
     toResult : Bool -> Result
-      | b := if b success (failure (mkFailure 0 nil));
+      | b := ite b success (failure (mkFailure 0 nil));
   in mkTestable \ {b := Testable.toProp (toResult b)};
 
 instance

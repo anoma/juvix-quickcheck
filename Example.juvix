@@ -19,21 +19,19 @@ prop-tailLengthOneLess (xs : List Int) : Bool :=
     || ofNat (length (tail xs)) == intSubNat (length xs) 1;
 
 prop-splitAtRecombine (n : Nat) (xs : List Int) : Bool :=
-  case splitAt n xs of {
-    lhs, rhs := eqListInt xs (lhs ++ rhs)
-  };
+  case splitAt n xs of
+    lhs, rhs := eqListInt xs (lhs ++ rhs);
 
 prop-mergeSumLengths
   (xs : List Int) (ys : List Int) : Bool :=
   length xs + length ys == length (merge {{ordIntI}} xs ys);
 
 prop-partition (xs : List Int) (p : Int -> Bool) : Bool :=
-  case partition p xs of {
+  case partition p xs of
     lhs, rhs :=
       all p lhs
         && not (any p rhs)
-        && eqListInt (sortInt xs) (sortInt (lhs ++ rhs))
-  };
+        && eqListInt (sortInt xs) (sortInt (lhs ++ rhs));
 
 prop-distributive
   (a : Int) (b : Int) (f : Int -> Int) : Bool :=

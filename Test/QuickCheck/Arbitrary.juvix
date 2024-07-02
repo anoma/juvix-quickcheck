@@ -22,10 +22,10 @@ arbitraryInt : Arbitrary Int :=
     (mkGen
       \ {rand :=
         let
-          runRand : Nat × StdGen := stdNext rand;
+          runRand : Pair Nat StdGen := stdNext rand;
           n : Nat := fst runRand;
           isPos : Bool := fst (randBool (snd runRand));
-        in if isPos (ofNat n) (negSuc n)});
+        in ite isPos (ofNat n) (negSuc n)});
 
 instance
 arbitraryBool : Arbitrary Bool :=
@@ -37,7 +37,7 @@ arbitraryList {A} {{Arbitrary A}} : Arbitrary (List A) :=
     (mkGen
       \ {rand :=
         let
-          randSplit : StdGen × StdGen := stdSplit rand;
+          randSplit : Pair StdGen StdGen := stdSplit rand;
           rand1 : StdGen := fst randSplit;
           rand2 : StdGen := snd randSplit;
           len : Nat := fst (randNat rand1 0 10);
@@ -45,7 +45,7 @@ arbitraryList {A} {{Arbitrary A}} : Arbitrary (List A) :=
             | _ zero := nil
             | r (suc n) :=
               let
-                rSplit : StdGen × StdGen := stdSplit r;
+                rSplit : Pair StdGen StdGen := stdSplit r;
                 r1 : StdGen := fst rSplit;
                 r2 : StdGen := snd rSplit;
               in Gen.run Arbitrary.gen r1 :: randList r2 n;

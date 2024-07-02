@@ -12,7 +12,8 @@ foldMap
     -> (A -> M)
     -> List A
     -> M
-  | (monoid mempty mappend) f := foldr (mappend ∘ f) mempty;
+  | (monoid mempty mappend) f :=
+    foldr (mappend << f) mempty;
 
 mconcat : {A : Type} -> Monoid A -> List A -> A
   | m xs := foldMap m id xs;
