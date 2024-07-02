@@ -43,27 +43,27 @@ stdNext : StdGen -> Pair Nat StdGen
       k : Int := div s1 (ofNat 206);
       s1' : Int :=
         ofNat 157 * (s1 - k * ofNat 206) - k * ofNat 21;
-      s1'' : Int := if (s1' < ofNat 0) (s1' + ofNat 32363) s1';
+      s1'' : Int := ite (s1' < ofNat 0) (s1' + ofNat 32363) s1';
       k' : Int := div s2 (ofNat 217);
       s2' : Int :=
         ofNat 146 * (s2 - k' * ofNat 217) - k' * ofNat 45;
-      s2'' : Int := if (s2' < ofNat 0) (s2' + ofNat 31727) s2';
+      s2'' : Int := ite (s2' < ofNat 0) (s2' + ofNat 31727) s2';
       k'' : Int := div s3 (ofNat 222);
       s3' : Int :=
         ofNat 142 * (s3 - k' * ofNat 222) - k' * ofNat 133;
-      s3'' : Int := if (s2' < ofNat 0) (s2' + ofNat 31657) s3';
+      s3'' : Int := ite (s2' < ofNat 0) (s2' + ofNat 31657) s3';
       z : Int := s1'' - s2'';
-      z' : Int := if (z > ofNat 706) (z - ofNat 32362) z;
+      z' : Int := ite (z > ofNat 706) (z - ofNat 32362) z;
       z'' : Int :=
-        if (z' < ofNat 1) (z' + ofNat 32362) (mod z (ofNat k1));
+        ite (z' < ofNat 1) (z' + ofNat 32362) (mod z (ofNat k1));
     in toNat z'', stdGen (toNat s1'') (toNat s2'') (toNat s3'');
 
 stdSplit : StdGen -> Pair StdGen StdGen
   | g@(stdGen s1 s2 s3) :=
     let
-      newS1 : Nat := if (s1 == k1) 1 (s1 + 1);
-      newS2 : Nat := if (s2 == 1) k2 (sub s2 1);
-      newS3 : Nat := if (s3 == k3) 1 (s3 + 1);
+      newS1 : Nat := ite (s1 == k1) 1 (s1 + 1);
+      newS2 : Nat := ite (s2 == 1) k2 (sub s2 1);
+      newS3 : Nat := ite (s3 == k3) 1 (s3 + 1);
       newG : StdGen := snd (stdNext g);
       leftG : StdGen :=
         stdGen newS1 (stdGenS2 newG) (stdGenS3 newG);

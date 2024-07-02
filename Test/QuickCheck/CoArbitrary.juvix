@@ -17,7 +17,7 @@ binaryDigits : Nat -> List Nat
     let
       terminating
       go : Nat -> List Nat
-        | n := if (n == 0) nil (mod n 2 :: go (div n 2));
+        | n := ite (n == 0) nil (mod n 2 :: go (div n 2));
     in reverse (go n);
 
 perturb : Int -> StdGen -> StdGen
@@ -27,7 +27,7 @@ perturb : Int -> StdGen -> StdGen
         | b g :=
           let
             splitG : Pair StdGen StdGen := stdSplit g;
-          in if b (snd splitG) (fst splitG);
+          in ite b (snd splitG) (fst splitG);
       terminating
       digitsParity : List Bool :=
         map (x in binaryDigits (abs n))

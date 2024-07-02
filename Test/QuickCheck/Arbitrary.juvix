@@ -25,7 +25,7 @@ arbitraryInt : Arbitrary Int :=
           runRand : Pair Nat StdGen := stdNext rand;
           n : Nat := fst runRand;
           isPos : Bool := fst (randBool (snd runRand));
-        in if isPos (ofNat n) (negSuc n)});
+        in ite isPos (ofNat n) (negSuc n)});
 
 instance
 arbitraryBool : Arbitrary Bool :=
