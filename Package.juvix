@@ -9,6 +9,6 @@ package : Package :=
      dependencies := [ github
                        "anoma"
                        "juvix-stdlib"
-                       "9d5b726e1dd885cd7784ec0bfabb448de0ac79dc"
+                       "c62c15e8538f5c8ac69aa270a46c0aeb8c185fa4"
                      ];
      main := just "Example.juvix"};

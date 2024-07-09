@@ -59,3 +59,35 @@ arbitraryFunction
   : Arbitrary (A -> B) :=
   mkArbitrary
     (promote (CoArbitrary.coarbitrary Arbitrary.gen));
+
+instance
+arbitraryMaybe {A} {{Arbitrary A}} : Arbitrary (Maybe A) :=
+  mkArbitrary
+    (mkGen
+      \ {rand :=
+        let
+          randSplit : Pair StdGen StdGen := stdSplit rand;
+          rand1 : StdGen := fst randSplit;
+          rand2 : StdGen := snd randSplit;
+          mkJust : Bool := fst (randBool rand1);
+        in if
+          | mkJust := Gen.run Arbitrary.gen rand2 |> just
+          | else := nothing});
+
+instance
+arbitraryEither
+  {A B}
+  {{Arbitrary A}}
+  {{Arbitrary B}}
+  : Arbitrary (Either A B) :=
+  mkArbitrary
+    (mkGen
+      \ {rand :=
+        let
+          randSplit : Pair StdGen StdGen := stdSplit rand;
+          rand1 : StdGen := fst randSplit;
+          rand2 : StdGen := snd randSplit;
+          mkLeft : Bool := fst (randBool rand1);
+        in if
+          | mkLeft := Gen.run Arbitrary.gen rand2 |> left
+          | else := Gen.run Arbitrary.gen rand2 |> right});
