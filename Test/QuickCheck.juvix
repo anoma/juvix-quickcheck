@@ -5,22 +5,22 @@ import Data.List open;
 import Data.Monoid open;
 import Data.Random open;
 import Test.QuickCheck.Property open public;
-import Test.QuickCheck.Result open public;
+import Test.QuickCheck.Outcome open public;
 import Test.QuickCheck.Testable open public;
 
 quickcheck
   {Predicate : Type}
   {{Testable Predicate}}
-  : Nat -> Nat -> Predicate -> Result
+  : Nat -> Nat -> Predicate -> Outcome
   | attemptNum startSeed predicate :=
     let
       seeds : List Nat :=
         map (n in range attemptNum)
           startSeed + n;
-      runOne (prop : Property) (nextSeed : Nat) : Result :=
+      runOne (prop : Property) (nextSeed : Nat) : Outcome :=
         let
-          result : Result := runProp prop (mkStdGen nextSeed);
+          result : Outcome := runProp prop (mkStdGen nextSeed);
         in overFailure result \ {f := f@Failure{seed := nextSeed}};
-      runAll (prop : Property) : Result :=
-        foldMap monoidResult (runOne prop) seeds;
+      runAll (prop : Property) : Outcome :=
+        foldMap monoidOutcome (runOne prop) seeds;
     in runAll (Testable.toProp predicate);

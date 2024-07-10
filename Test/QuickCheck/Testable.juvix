@@ -4,7 +4,7 @@ import Stdlib.Prelude open;
 import Data.Random open;
 import Test.QuickCheck.Arbitrary open;
 import Test.QuickCheck.CoArbitrary open;
-import Test.QuickCheck.Result open;
+import Test.QuickCheck.Outcome open;
 import Test.QuickCheck.Property open;
 import Test.QuickCheck.Gen open;
 
@@ -29,7 +29,7 @@ forAll
             rand2 : StdGen := snd srand;
             arg : A := Gen.run Arbitrary.gen rand1;
             subProp : Property := Testable.toProp (prop arg);
-            res : Result := runProp subProp rand2;
+            res : Outcome := runProp subProp rand2;
           in overFailure
             res
             \ {f :=
@@ -40,15 +40,15 @@ instance
 testableProperty : Testable Property := mkTestable id;
 
 instance
-testableResult : Testable Result :=
+testableOutcome : Testable Outcome :=
   mkTestable \ {r := mkProperty (mkGen (const r))};
 
 instance
 testableBool : Testable Bool :=
   let
-    toResult : Bool -> Result
+    toOutcome : Bool -> Outcome
       | b := ite b success (failure (mkFailure 0 nil));
-  in mkTestable \ {b := Testable.toProp (toResult b)};
+  in mkTestable \ {b := Testable.toProp (toOutcome b)};
 
 instance
 testableFunction

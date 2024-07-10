@@ -75,11 +75,11 @@ arbitraryMaybe {A} {{Arbitrary A}} : Arbitrary (Maybe A) :=
           | else := nothing});
 
 instance
-arbitraryEither
+arbitraryResult
   {A B}
   {{Arbitrary A}}
   {{Arbitrary B}}
-  : Arbitrary (Either A B) :=
+  : Arbitrary (Result A B) :=
   mkArbitrary
     (mkGen
       \ {rand :=
@@ -87,7 +87,7 @@ arbitraryEither
           randSplit : Pair StdGen StdGen := stdSplit rand;
           rand1 : StdGen := fst randSplit;
           rand2 : StdGen := snd randSplit;
-          mkLeft : Bool := fst (randBool rand1);
+          mkError : Bool := fst (randBool rand1);
         in if
-          | mkLeft := Gen.run Arbitrary.gen rand2 |> left
-          | else := Gen.run Arbitrary.gen rand2 |> right});
+          | mkError := Gen.run Arbitrary.gen rand2 |> error
+          | else := Gen.run Arbitrary.gen rand2 |> ok});

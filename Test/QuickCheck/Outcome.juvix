@@ -1,4 +1,4 @@
-module Test.QuickCheck.Result;
+module Test.QuickCheck.Outcome;
 
 import Stdlib.Prelude open;
 import Data.Monoid open;
@@ -10,15 +10,15 @@ type Failure :=
     counterExamples : List String
   };
 
-type Result :=
+type Outcome :=
   | success
   | failure Failure;
 
-isSuccess : Result -> Bool
+isSuccess : Outcome -> Bool
   | success := true
   | (failure _) := false;
 
-showResult : Result -> String
+showOutcome : Outcome -> String
   | success := "success"
   | (failure mkFailure@{seed; counterExamples}) :=
     "failure "
@@ -29,9 +29,9 @@ showResult : Result -> String
       ++str ")";
 
 instance
-showResultI : Show Result := mkShow showResult;
+showOutcomeI : Show Outcome := mkShow showOutcome;
 
-monoidResult : Monoid Result :=
+monoidOutcome : Monoid Outcome :=
   monoid
     success
     \ {
@@ -39,9 +39,9 @@ monoidResult : Monoid Result :=
       | _ y := y
     };
 
-overFailure : Result -> (Failure -> Failure) -> Result
+overFailure : Outcome -> (Failure -> Failure) -> Outcome
   | success _ := success
   | (failure x) f := failure (f x);
 
-allSuccess : List Result -> Bool :=
-  isSuccess << foldMap monoidResult id;
+allSuccess : List Outcome -> Bool :=
+  isSuccess << foldMap monoidOutcome id;
