@@ -2,18 +2,10 @@ module Data.Monoid;
 
 import Stdlib.Prelude open;
 
-type Monoid (A : Type) :=
-  monoid : A -> (A -> A -> A) -> Monoid A;
+type Monoid (A : Type) := monoid : A -> (A -> A -> A) -> Monoid A;
 
-foldMap
-  : {A : Type}
-    -> {M : Type}
-    -> Monoid M
-    -> (A -> M)
-    -> List A
-    -> M
-  | (monoid mempty mappend) f :=
-    foldr (mappend << f) mempty;
+foldMap : {A : Type} -> {M : Type} -> Monoid M -> (A -> M) -> List A -> M
+  | (monoid mempty mappend) f := foldr (mappend << f) mempty;
 
 mconcat : {A : Type} -> Monoid A -> List A -> A
   | m xs := foldMap m id xs;

@@ -43,5 +43,4 @@ overFailure : Outcome -> (Failure -> Failure) -> Outcome
   | success _ := success
   | (failure x) f := failure (f x);
 
-allSuccess : List Outcome -> Bool :=
-  isSuccess << foldMap monoidOutcome id;
+allSuccess : List Outcome -> Bool := isSuccess << foldMap monoidOutcome id;

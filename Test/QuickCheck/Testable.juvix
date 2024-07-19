@@ -10,15 +10,9 @@ import Test.QuickCheck.Gen open;
 
 --- A conversion from a Type A to a ;Property;
 trait
-type Testable (A : Type) :=
-  mkTestable {toProp : A -> Property};
+type Testable (A : Type) := mkTestable {toProp : A -> Property};
 
-forAll
-  {A T : Type}
-  {{Show A}}
-  {{Arbitrary A}}
-  {{Testable T}}
-  : (A -> T) -> Property
+forAll {A T : Type} {{Show A}} {{Arbitrary A}} {{Testable T}} : (A -> T) -> Property
   | prop :=
     mkProperty
       (mkGen
@@ -32,16 +26,13 @@ forAll
             res : Outcome := runProp subProp rand2;
           in overFailure
             res
-            \ {f :=
-              f@Failure{counterExamples := Show.show arg
-                :: counterExamples}}});
+            \ {f := f@Failure{counterExamples := Show.show arg :: counterExamples}}});
 
 instance
 testableProperty : Testable Property := mkTestable id;
 
 instance
-testableOutcome : Testable Outcome :=
-  mkTestable \ {r := mkProperty (mkGen (const r))};
+testableOutcome : Testable Outcome := mkTestable \ {r := mkProperty (mkGen (const r))};
 
 instance
 testableBool : Testable Bool :=
@@ -51,13 +42,8 @@ testableBool : Testable Bool :=
   in mkTestable \ {b := Testable.toProp (toOutcome b)};
 
 instance
-testableFunction
-  {A T}
-  {{Show A}}
-  {{Arbitrary A}}
-  {{Testable T}}
-  : Testable (A -> T) := mkTestable \ {f := forAll f};
+testableFunction {A T} {{Show A}} {{Arbitrary A}} {{Testable T}} : Testable (A -> T) :=
+  mkTestable \ {f := forAll f};
 
 instance
-showableFunction {A B : Type} : Show (A -> B) :=
-  mkShow (const "function");
+showableFunction {A B : Type} : Show (A -> B) := mkShow (const "function");

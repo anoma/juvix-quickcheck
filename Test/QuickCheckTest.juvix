@@ -14,12 +14,8 @@ type Test :=
     property : Property
   };
 
-mkTest
-  {Predicate : Type}
-  {{Testable Predicate}}
-  (name : String)
-  (predicate : Predicate)
-  : Test := test name (Testable.toProp predicate);
+mkTest {Predicate : Type} {{Testable Predicate}} (name : String) (predicate : Predicate) : Test :=
+  test name (Testable.toProp predicate);
 
 type TestOutcome :=
   testOutcome {
@@ -27,33 +23,25 @@ type TestOutcome :=
     outcome : Outcome
   };
 
-allTestSuccess (ts : List TestOutcome) : Bool :=
-  allSuccess (map TestOutcome.outcome ts);
+allTestSuccess (ts : List TestOutcome) : Bool := allSuccess (map TestOutcome.outcome ts);
 
 showTestOutcome (outcome : TestOutcome) : String :=
-  "'"
-    ++str TestOutcome.name outcome
-    ++str "': "
-    ++str showOutcome (TestOutcome.outcome outcome);
+  "'" ++str TestOutcome.name outcome ++str "': " ++str showOutcome (TestOutcome.outcome outcome);
 
 runTest : Nat -> Nat -> Test -> TestOutcome
-  | attemptNum seed (test name p) :=
-    testOutcome name (quickcheck attemptNum seed p);
+  | attemptNum seed (test name p) := testOutcome name (quickcheck attemptNum seed p);
 
 runTests : Nat -> Nat -> List Test -> List TestOutcome
   | attemptNum startSeed ts :=
     let
       numTests : Nat := length ts;
-      testSeeds : List Nat :=
-        map (n in rangeStep attemptNum numTests)
-          startSeed + n;
+      testSeeds : List Nat := map (n in rangeStep attemptNum numTests) startSeed + n;
     in zipWith (runTest attemptNum) testSeeds ts;
 
 runTestsIO : Nat -> Nat -> List Test -> IO
   | attemptNum startSeed ts :=
     let
-      outcomes : List TestOutcome :=
-        runTests attemptNum startSeed ts;
+      outcomes : List TestOutcome := runTests attemptNum startSeed ts;
     in printStringLn (lines (map showTestOutcome outcomes))
       >>> ite
         (allTestSuccess outcomes)
