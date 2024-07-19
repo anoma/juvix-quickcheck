@@ -14,48 +14,36 @@ type Test :=
     property : Property
   };
 
-mkTest
-  {Predicate : Type}
-  {{Testable Predicate}}
-  (name : String)
-  (predicate : Predicate)
-  : Test := test name (Testable.toProp predicate);
+mkTest {Predicate : Type} {{Testable Predicate}} (name : String) (predicate : Predicate) : Test :=
+  test name (Testable.toProp predicate);
 
-type TestResult :=
-  testResult {
+type TestOutcome :=
+  testOutcome {
     name : String;
-    result : Result
+    outcome : Outcome
   };
 
-allTestSuccess (ts : List TestResult) : Bool :=
-  allSuccess (map TestResult.result ts);
+allTestSuccess (ts : List TestOutcome) : Bool := allSuccess (map TestOutcome.outcome ts);
 
-showTestResult (result : TestResult) : String :=
-  "'"
-    ++str TestResult.name result
-    ++str "': "
-    ++str showResult (TestResult.result result);
+showTestOutcome (outcome : TestOutcome) : String :=
+  "'" ++str TestOutcome.name outcome ++str "': " ++str showOutcome (TestOutcome.outcome outcome);
 
-runTest : Nat -> Nat -> Test -> TestResult
-  | attemptNum seed (test name p) :=
-    testResult name (quickcheck attemptNum seed p);
+runTest : Nat -> Nat -> Test -> TestOutcome
+  | attemptNum seed (test name p) := testOutcome name (quickcheck attemptNum seed p);
 
-runTests : Nat -> Nat -> List Test -> List TestResult
+runTests : Nat -> Nat -> List Test -> List TestOutcome
   | attemptNum startSeed ts :=
     let
       numTests : Nat := length ts;
-      testSeeds : List Nat :=
-        map (n in rangeStep attemptNum numTests)
-          startSeed + n;
+      testSeeds : List Nat := map (n in rangeStep attemptNum numTests) startSeed + n;
     in zipWith (runTest attemptNum) testSeeds ts;
 
 runTestsIO : Nat -> Nat -> List Test -> IO
   | attemptNum startSeed ts :=
     let
-      results : List TestResult :=
-        runTests attemptNum startSeed ts;
-    in printStringLn (lines (map showTestResult results))
+      outcomes : List TestOutcome := runTests attemptNum startSeed ts;
+    in printStringLn (lines (map showTestOutcome outcomes))
       >>> ite
-        (allTestSuccess results)
+        (allTestSuccess outcomes)
         (printStringLn "All tests passed")
         (Fail.failwith "Test failed");

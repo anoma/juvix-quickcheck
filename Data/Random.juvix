@@ -41,21 +41,17 @@ stdNext : StdGen -> Pair Nat StdGen
       s2 : Int := ofNat s2Nat;
       s3 : Int := ofNat s3Nat;
       k : Int := div s1 (ofNat 206);
-      s1' : Int :=
-        ofNat 157 * (s1 - k * ofNat 206) - k * ofNat 21;
+      s1' : Int := ofNat 157 * (s1 - k * ofNat 206) - k * ofNat 21;
       s1'' : Int := ite (s1' < ofNat 0) (s1' + ofNat 32363) s1';
       k' : Int := div s2 (ofNat 217);
-      s2' : Int :=
-        ofNat 146 * (s2 - k' * ofNat 217) - k' * ofNat 45;
+      s2' : Int := ofNat 146 * (s2 - k' * ofNat 217) - k' * ofNat 45;
       s2'' : Int := ite (s2' < ofNat 0) (s2' + ofNat 31727) s2';
       k'' : Int := div s3 (ofNat 222);
-      s3' : Int :=
-        ofNat 142 * (s3 - k' * ofNat 222) - k' * ofNat 133;
+      s3' : Int := ofNat 142 * (s3 - k' * ofNat 222) - k' * ofNat 133;
       s3'' : Int := ite (s2' < ofNat 0) (s2' + ofNat 31657) s3';
       z : Int := s1'' - s2'';
       z' : Int := ite (z > ofNat 706) (z - ofNat 32362) z;
-      z'' : Int :=
-        ite (z' < ofNat 1) (z' + ofNat 32362) (mod z (ofNat k1));
+      z'' : Int := ite (z' < ofNat 1) (z' + ofNat 32362) (mod z (ofNat k1));
     in toNat z'', stdGen (toNat s1'') (toNat s2'') (toNat s3'');
 
 stdSplit : StdGen -> Pair StdGen StdGen
@@ -65,18 +61,11 @@ stdSplit : StdGen -> Pair StdGen StdGen
       newS2 : Nat := ite (s2 == 1) k2 (sub s2 1);
       newS3 : Nat := ite (s3 == k3) 1 (s3 + 1);
       newG : StdGen := snd (stdNext g);
-      leftG : StdGen :=
-        stdGen newS1 (stdGenS2 newG) (stdGenS3 newG);
+      leftG : StdGen := stdGen newS1 (stdGenS2 newG) (stdGenS3 newG);
       rightG : StdGen := stdGen (stdGenS1 newG) newS2 newS3;
     in leftG, rightG;
 
-randNatAux
-  : StdGen
-    -> Nat
-    -> Nat
-    -> Nat
-    -> Pair Nat StdGen
-    -> Pair Nat StdGen
+randNatAux : StdGen -> Nat -> Nat -> Nat -> Pair Nat StdGen -> Pair Nat StdGen
   | g genLo genMag :=
     let
       terminating
@@ -98,8 +87,7 @@ randNat : StdGen -> Nat -> Nat -> Pair Nat StdGen
       q : Nat := 1000;
       k : Nat := sub hi lo + 1;
       tgtMag : Nat := k * q;
-      x : Pair Nat StdGen :=
-        randNatAux g genLo genMag tgtMag (0, g);
+      x : Pair Nat StdGen := randNatAux g genLo genMag tgtMag (0, g);
       v : Nat := fst x;
       g' : StdGen := snd x;
       v' : Nat := lo + mod v k;

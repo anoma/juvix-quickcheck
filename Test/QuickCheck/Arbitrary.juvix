@@ -9,12 +9,10 @@ import Test.QuickCheck.CoArbitrary open;
 trait
 type Arbitrary (A : Type) := mkArbitrary {gen : Gen A};
 
-runArb {A} {{Arbitrary A}} (rand : StdGen) : A :=
-  Gen.run Arbitrary.gen rand;
+runArb {A} {{Arbitrary A}} (rand : StdGen) : A := Gen.run Arbitrary.gen rand;
 
 instance
-arbitraryNat : Arbitrary Nat :=
-  mkArbitrary (mkGen \ {rand := fst (stdNext rand)});
+arbitraryNat : Arbitrary Nat := mkArbitrary (mkGen \ {rand := fst (stdNext rand)});
 
 instance
 arbitraryInt : Arbitrary Int :=
@@ -28,8 +26,7 @@ arbitraryInt : Arbitrary Int :=
         in ite isPos (ofNat n) (negSuc n)});
 
 instance
-arbitraryBool : Arbitrary Bool :=
-  mkArbitrary (mkGen \ {rand := fst (randBool rand)});
+arbitraryBool : Arbitrary Bool := mkArbitrary (mkGen \ {rand := fst (randBool rand)});
 
 instance
 arbitraryList {A} {{Arbitrary A}} : Arbitrary (List A) :=
@@ -52,10 +49,33 @@ arbitraryList {A} {{Arbitrary A}} : Arbitrary (List A) :=
         in randList rand2 len});
 
 instance
-arbitraryFunction
-  {A B}
-  {{CoArbitrary A}}
-  {{Arbitrary B}}
-  : Arbitrary (A -> B) :=
+arbitraryFunction {A B} {{CoArbitrary A}} {{Arbitrary B}} : Arbitrary (A -> B) :=
+  mkArbitrary (promote (CoArbitrary.coarbitrary Arbitrary.gen));
+
+instance
+arbitraryMaybe {A} {{Arbitrary A}} : Arbitrary (Maybe A) :=
   mkArbitrary
-    (promote (CoArbitrary.coarbitrary Arbitrary.gen));
+    (mkGen
+      \ {rand :=
+        let
+          randSplit : Pair StdGen StdGen := stdSplit rand;
+          rand1 : StdGen := fst randSplit;
+          rand2 : StdGen := snd randSplit;
+          mkJust : Bool := fst (randBool rand1);
+        in if
+          | mkJust := Gen.run Arbitrary.gen rand2 |> just
+          | else := nothing});
+
+instance
+arbitraryResult {A B} {{Arbitrary A}} {{Arbitrary B}} : Arbitrary (Result A B) :=
+  mkArbitrary
+    (mkGen
+      \ {rand :=
+        let
+          randSplit : Pair StdGen StdGen := stdSplit rand;
+          rand1 : StdGen := fst randSplit;
+          rand2 : StdGen := snd randSplit;
+          mkError : Bool := fst (randBool rand1);
+        in if
+          | mkError := Gen.run Arbitrary.gen rand2 |> error
+          | else := Gen.run Arbitrary.gen rand2 |> ok});

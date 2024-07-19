@@ -3,8 +3,9 @@ module Package;
 import PackageDescription.V2 open;
 
 package : Package :=
-  defaultPackage
-    {name := "quickcheck";
-     version := mkVersion 0 12 0;
-     dependencies := [github "anoma" "juvix-stdlib" "v0.4.0"];
-     main := just "Example.juvix"};
+  defaultPackage@?{
+    name := "quickcheck";
+    version := mkVersion 0 13 0;
+    dependencies := [github "anoma" "juvix-stdlib" "v0.5.0"];
+    main := just "Example.juvix"
+  };
