@@ -14,13 +14,13 @@ import Stdlib.Data.Nat.Ord open;
 
 import Test.QuickCheckTest as QC;
 
-prop-reverseReverseIsIdentity (xs : List Int) : Bool :=
+propReverseReverseIsIdentity (xs : List Int) : Bool :=
   Eq.eq xs (reverse (reverse xs));
 
 reverseTest : QC.Test :=
   QC.mkTest
     "reverse of reverse is identity"
-    prop-reverseReverseIsIdentity;
+    propReverseReverseIsIdentity;
 
 main : IO :=
   readLn
