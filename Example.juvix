@@ -13,7 +13,7 @@ prop-reverseDoesNotChangeLength (xs : List Int) : Bool := length (reverse xs) ==
 prop-reverseReverseIsIdentity (xs : List Int) : Bool := eqListInt xs (reverse (reverse xs));
 
 prop-tailLengthOneLess (xs : List Int) : Bool :=
-  null xs || ofNat (length (tail xs)) == intSubNat (length xs) 1;
+  isEmpty xs || ofNat (length (tail xs)) == intSubNat (length xs) 1;
 
 prop-splitAtRecombine (n : Nat) (xs : List Int) : Bool :=
   case splitAt n xs of lhs, rhs := eqListInt xs (lhs ++ rhs);
