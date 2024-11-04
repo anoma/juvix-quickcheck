@@ -1,4 +1,3 @@
 module Data.Debug;
 
-terminating
-undefined : {A : Type} -> A := undefined;
+axiom undefined : {A : Type} -> A;

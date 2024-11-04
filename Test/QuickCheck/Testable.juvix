@@ -26,7 +26,7 @@ forAll {A T : Type} {{Show A}} {{Arbitrary A}} {{Testable T}} : (A -> T) -> Prop
             res : Outcome := runProp subProp rand2;
           in overFailure
             res
-            \ {f := f@Failure{counterExamples := Show.show arg :: counterExamples}}});
+            \ {f := f@Failure{counterExamples := Show.show arg :: Failure.counterExamples f}}});
 
 instance
 testableProperty : Testable Property := mkTestable id;
