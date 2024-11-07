@@ -5,7 +5,7 @@ import PackageDescription.V2 open;
 package : Package :=
   defaultPackage@?{
     name := "quickcheck";
-    version := mkVersion 0 15 0;
-    dependencies := [github "anoma" "juvix-stdlib" "ca916cf56258396cc1c559cebf355106b6de199d"];
-    main := just "Example.juvix"
+    version := mkVersion 0 16 0;
+    dependencies := [github "anoma" "juvix-stdlib" "v0.8.0"];
+    main := just "Example.juvix";
   };
