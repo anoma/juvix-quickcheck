@@ -6,6 +6,6 @@ package : Package :=
   defaultPackage@?{
     name := "quickcheck";
     version := mkVersion 0 16 0;
-    dependencies := [github "anoma" "juvix-stdlib" "v0.8.0"];
+    dependencies := [defaultStdlib];
     main := just "Example.juvix";
   };
