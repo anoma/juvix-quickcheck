@@ -5,7 +5,7 @@ import Data.Monoid open;
 import Data.String open;
 
 type Failure :=
-  mkFailure@{
+  mk@{
     seed : Nat;
     counterExamples : List String;
   };
@@ -14,13 +14,15 @@ type Outcome :=
   | success
   | failure Failure;
 
+open Outcome public;
+
 isSuccess : Outcome -> Bool
   | success := true
   | (failure _) := false;
 
 showOutcome : Outcome -> String
   | success := "success"
-  | (failure mkFailure@{seed; counterExamples}) :=
+  | (failure Failure.mk@{seed; counterExamples}) :=
     "failure "
       ++str "(seed : "
       ++str natToString seed
@@ -29,18 +31,21 @@ showOutcome : Outcome -> String
       ++str ")";
 
 instance
-showOutcomeI : Show Outcome := mkShow showOutcome;
+showOutcomeI : Show Outcome := Show.mk showOutcome;
 
+instance
 monoidOutcome : Monoid Outcome :=
-  monoid
-    success
-    \{
-      | x@(failure _) _ := x
-      | _ y := y
-    };
+  Monoid.mk@{
+    mempty := success;
+    mappend :=
+      \{
+        | x@(failure _) _ := x
+        | _ y := y
+      };
+  };
 
 overFailure : Outcome -> (Failure -> Failure) -> Outcome
   | success _ := success
   | (failure x) f := failure (f x);
 
-allSuccess : List Outcome -> Bool := isSuccess << foldMap monoidOutcome id;
+allSuccess : List Outcome -> Bool := isSuccess << foldMap id;
