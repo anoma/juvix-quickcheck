@@ -20,6 +20,5 @@ quickcheck
         let
           result : Outcome := runProp prop (mkStdGen nextSeed);
         in overFailure result \{f := f@Failure{seed := nextSeed}};
-      runAll (prop : Property) : Outcome :=
-        foldMap monoidOutcome (runOne prop) seeds;
+      runAll (prop : Property) : Outcome := foldMap (runOne prop) seeds;
     in runAll (Testable.toProp predicate);

@@ -15,7 +15,7 @@ prop-reverseReverseIsIdentity (xs : List Int) : Bool :=
   eqListInt xs (reverse (reverse xs));
 
 prop-tailLengthOneLess (xs : List Int) : Bool :=
-  isEmpty xs || ofNat (length (tail xs)) == intSubNat (length xs) 1;
+  isEmpty xs || fromNat (length (tail xs)) == Int.subNat (length xs) 1;
 
 prop-splitAtRecombine (n : Nat) (xs : List Int) : Bool :=
   case splitAt n xs of lhs, rhs := eqListInt xs (lhs ++ rhs);
@@ -35,9 +35,9 @@ prop-distributive (a : Int) (b : Int) (f : Int -> Int) : Bool :=
 
 prop-add-sub (a : Int) (b : Int) : Bool := a == a + b - b;
 
-prop-add-sub-bad (a : Int) (b : Int) : Bool := a == ofNat 2;
+prop-add-sub-bad (a : Int) (b : Int) : Bool := a == fromNat 2;
 
-prop-gcd-bad (a : Int) (b : Int) : Bool := gcd a b > ofNat 1;
+prop-gcd-bad (a : Int) (b : Int) : Bool := gcd a b > fromNat 1;
 
 gcdNoCoprimeTest : QC.Test := QC.mkTest "no integers are coprime" prop-gcd-bad;
 

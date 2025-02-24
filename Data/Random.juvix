@@ -7,6 +7,8 @@ import Stdlib.Prelude open;
 
 type StdGen := stdGen : Nat -> Nat -> Nat -> StdGen;
 
+open StdGen;
+
 stdGenS1 : StdGen -> Nat
   | (stdGen s1 _ _) := s1;
 
@@ -37,22 +39,23 @@ stdRange : Pair Nat Nat := 1, k1;
 stdNext : StdGen -> Pair Nat StdGen
   | (stdGen s1Nat s2Nat s3Nat) :=
     let
-      s1 : Int := ofNat s1Nat;
-      s2 : Int := ofNat s2Nat;
-      s3 : Int := ofNat s3Nat;
-      k : Int := div s1 (ofNat 206);
-      s1' : Int := ofNat 157 * (s1 - k * ofNat 206) - k * ofNat 21;
-      s1'' : Int := ite (s1' < ofNat 0) (s1' + ofNat 32363) s1';
-      k' : Int := div s2 (ofNat 217);
-      s2' : Int := ofNat 146 * (s2 - k' * ofNat 217) - k' * ofNat 45;
-      s2'' : Int := ite (s2' < ofNat 0) (s2' + ofNat 31727) s2';
-      k'' : Int := div s3 (ofNat 222);
-      s3' : Int := ofNat 142 * (s3 - k' * ofNat 222) - k' * ofNat 133;
-      s3'' : Int := ite (s2' < ofNat 0) (s2' + ofNat 31657) s3';
+      s1 : Int := fromNat s1Nat;
+      s2 : Int := fromNat s2Nat;
+      s3 : Int := fromNat s3Nat;
+      k : Int := div s1 (fromNat 206);
+      s1' : Int := fromNat 157 * (s1 - k * fromNat 206) - k * fromNat 21;
+      s1'' : Int := ite (s1' < fromNat 0) (s1' + fromNat 32363) s1';
+      k' : Int := div s2 (fromNat 217);
+      s2' : Int := fromNat 146 * (s2 - k' * fromNat 217) - k' * fromNat 45;
+      s2'' : Int := ite (s2' < fromNat 0) (s2' + fromNat 31727) s2';
+      k'' : Int := div s3 (fromNat 222);
+      s3' : Int := fromNat 142 * (s3 - k' * fromNat 222) - k' * fromNat 133;
+      s3'' : Int := ite (s2' < fromNat 0) (s2' + fromNat 31657) s3';
       z : Int := s1'' - s2'';
-      z' : Int := ite (z > ofNat 706) (z - ofNat 32362) z;
-      z'' : Int := ite (z' < ofNat 1) (z' + ofNat 32362) (mod z (ofNat k1));
-    in toNat z'', stdGen (toNat s1'') (toNat s2'') (toNat s3'');
+      z' : Int := ite (z > fromNat 706) (z - fromNat 32362) z;
+      z'' : Int :=
+        ite (z' < fromNat 1) (z' + fromNat 32362) (mod z (fromNat k1));
+    in Int.toNat z'', stdGen (Int.toNat s1'') (Int.toNat s2'') (Int.toNat s3'');
 
 stdSplit : StdGen -> Pair StdGen StdGen
   | g@(stdGen s1 s2 s3) :=

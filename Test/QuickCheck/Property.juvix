@@ -6,7 +6,7 @@ import Test.QuickCheck.Outcome open;
 
 --- A testable predicate from which we can obtain a ;Gen Outcome;
 type Property :=
-  mkProperty@{
+  mk@{
     getGen : Gen Outcome;
   };
 

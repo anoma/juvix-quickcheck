@@ -14,6 +14,8 @@ type Test :=
     property : Property;
   };
 
+open Test using {test} public;
+
 mkTest
   {Predicate : Type}
   {{Testable Predicate}}
@@ -26,6 +28,8 @@ type TestOutcome :=
     name : String;
     outcome : Outcome;
   };
+
+open TestOutcome using {testOutcome} public;
 
 allTestSuccess (ts : List TestOutcome) : Bool :=
   allSuccess (map TestOutcome.outcome ts);

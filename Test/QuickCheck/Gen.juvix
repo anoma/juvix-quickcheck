@@ -4,9 +4,9 @@ import Data.Random open;
 
 --- A generator of values of type A
 type Gen (A : Type) :=
-  mkGen@{
+  mk@{
     run : StdGen -> A;
   };
 
 promote {A B} (f : A -> Gen B) : Gen (A -> B) :=
-  mkGen \{rand a := Gen.run (f a) rand};
+  Gen.mk \{rand a := Gen.run (f a) rand};
